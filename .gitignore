@@ -87,3 +87,8 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+.*.swp
+.dropbox.attr
+.ipynb_checkpoints
+.DS_Store
