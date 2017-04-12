@@ -31,7 +31,6 @@ try:
 except ImportError:
 	from scipy.special import kv as BesselK
 	from scipy.special import gamma as Gamma
-import mpmath
 #import gamma_funcs
 
 
