@@ -186,7 +186,7 @@ def read_results(fn, model='sersic'):
     if model=='sersic':
         for i in range(7):
             results[SERSIC_PARAMS[i]] = float(params[i].split()[1])
-            if len(params[i].split())==4:
+            if len(params[i].split())==5:
                 results[SERSIC_PARAMS[i]+'_err'] = float(params[i].split()[4])
 
     return results

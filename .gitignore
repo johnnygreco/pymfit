@@ -92,3 +92,4 @@ ENV/
 .dropbox.attr
 .ipynb_checkpoints
 .DS_Store
+local_data
