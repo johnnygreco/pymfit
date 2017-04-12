@@ -21,8 +21,8 @@ from ..sersic import Sersic
 __all__ = ['sersic_fit', 'DEFAULT_PARAMS', 'DEFAULT_MASK']
 
 
-DEFAULT_PARAMS = {'X0': None , # If None, use center +/- 30 pix
-                  'Y0': None,  # If None, use center +/- 30 pix
+DEFAULT_PARAMS = {'X0': None , # If None, use center +/- delta_pos pix
+                  'Y0': None,  # If None, use center +/- delta_pos pix
                   'PA': [18., 0, 360], 
                   'ell': [0.2, 0, 0.99], 
                   'n': [1.0, 0.01, 5], 
@@ -38,8 +38,8 @@ DEFAULT_MASK = {'thresh': 1.5,
                 'mask_thresh': 0.02, 
                 'grow_obj': 3.0, 
                 'kern_sig': 4.0, 
-                'sep_extract_kws': {'deblend_nthresh': 16, 
-                                    'deblend_cont': 0.001}}
+                'use_hsc_mask': False,
+                'sep_extract_kws':{}}
 
 
 def sersic_fit(img_fn, init_params={}, prefix='fit', clean='both', 
