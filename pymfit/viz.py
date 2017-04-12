@@ -65,8 +65,7 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
     mu_0 = r'$\mu_0='+str(round(s.mu_0,1))+'$'
     mu_e = r'$\mu_e='+str(round(s.mu_e,1))+'$'
     n = r'$n = '+str(round(s.n,2))+'$'
-    chisq = r'$\chi^2_\mathrm{dof} = '+\
-            str(round(mod_params['reduced_chisq'],2))+'$' 
+
     c = 'b'
 
     axes[1].text(x, y, m_tot, transform=axes[1].transAxes, 
@@ -79,10 +78,13 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
                  fontsize=fs, color=c)
     axes[1].text(x+dx, y-dy, r_e, transform=axes[1].transAxes, 
                  fontsize=fs, color=c)
-    axes[1].text(x+dx, y-2*dy, chisq, transform=axes[1].transAxes, 
-                 fontsize=fs, color=c)
     axes[1].text(0.9, 0.05, band, color='r', transform=axes[1].transAxes,
                  fontsize=25)
+    if 'reduced_chisq' in list(mod_params.keys()):
+        chisq = r'$\chi^2_\mathrm{dof} = '+\
+                str(round(mod_params['reduced_chisq'],2))+'$' 
+        axes[1].text(x+dx, y-2*dy, chisq, transform=axes[1].transAxes, 
+                     fontsize=fs, color=c)
 
     if show:
         plt.show()

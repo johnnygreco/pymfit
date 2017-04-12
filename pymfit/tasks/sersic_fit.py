@@ -26,8 +26,8 @@ DEFAULT_PARAMS = {'X0': None , # If None, use center +/- 30 pix
                   'PA': [18., 0, 360], 
                   'ell': [0.2, 0, 0.99], 
                   'n': [1.0, 0.01, 5], 
-                  'I_e': 0.05, 
-                  'r_e': 20.0}
+                  'I_e': [0.05, 0.0, 1000],
+                  'r_e': [20., 0.0, 5000]}
 
 DEFAULT_MASK = {'thresh': 1.5,
                 'backsize': 110, 
@@ -43,8 +43,8 @@ DEFAULT_MASK = {'thresh': 1.5,
 
 
 def sersic_fit(img_fn, init_params={}, prefix='fit', clean='both', 
-               visualize=False, photo_mask_fn=None, mask_kwargs={}, 
-               delta_pos=50.0, psf_fn=None, quiet=False, band_label='i'):
+               visualize=False, photo_mask_fn=None, mask_kws={}, 
+               delta_pos=50.0, band_label='i', run_kws={}):
     """
     Perform 2D galaxy fit using the hugs.imfit module, 
     which use imfit and SEP. Most of the work in this function is 
@@ -68,14 +68,16 @@ def sersic_fit(img_fn, init_params={}, prefix='fit', clean='both',
     photo_mask_fn : string
         File name of photometry mask. If None, it will be created
         using sep. 
-    mask_kwargs : dict, optional
+    mask_kws : dict, optional
         Any parameter for hugs.imfit.make_mask except masked_image
         and out_fn, which are set in this function. Can also
     delta_pos : float, optional
         Uncertainty in position in pixels. Only used if X0=Y0=None, 
         in which case the center of the image is assumed. 
-    psf_fn : str, optional
-        PSF fits file.
+    band_label: str, optional
+        Filter label for figure.
+    run_kws: dict, optional
+        Keywords for pymfit.core.run
 
     Returns
     -------
@@ -96,7 +98,7 @@ def sersic_fit(img_fn, init_params={}, prefix='fit', clean='both',
     ######################################################################
 
     mask_params = DEFAULT_MASK.copy()
-    for k,v in list(mask_kwargs.items()):
+    for k,v in list(mask_kws.items()):
         if k in list(DEFAULT_MASK.keys()):
             mask_params[k] = v
         else:
@@ -142,7 +144,7 @@ def sersic_fit(img_fn, init_params={}, prefix='fit', clean='both',
     var_fn = img_fn+'[3]'
     results = run(
         img_fn+'[1]', config_fn, photo_mask_fn, var_fn,
-        out_fn=out_fn, config=imfit_config, psf_fn=psf_fn, quiet=quiet)
+        out_fn=out_fn, config=imfit_config, **run_kws)
 
     if visualize:
         img_mod_res(

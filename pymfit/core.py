@@ -13,8 +13,9 @@ SERSIC_PARAMS = ['X0', 'Y0', 'PA', 'ell', 'n', 'I_e', 'r_e']
 
 
 def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,  
-        save_res=False, out_fn='bestfit_imfit_params.dat', 
-        config=None, psf_fn=None, poisson_mlr=False, quiet=False):
+        save_res=False, out_fn='bestfit_imfit_params.dat', config=None, 
+        psf_fn=None, poisson_mlr=False, quiet=False, cashstat=False,
+        options='', mcmc=False, mcmc_prefix='mcmc-out-'):
     """
     Run imfit.
 
@@ -45,7 +46,16 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
     quiet: bool, optional
         If True, supress printing of intermediate fit-statistic
         vaules during the fitting process.
-
+    cashstat: bool, optional
+        If True, Use Cash statistic instead of chi^2
+    options: string, optional
+        Additional command-line options. Can be anything imfit takes.
+        e.g., '--max-threads 5 --seed 341 --quiet'
+    mcmc: bool, optional
+        Run imfit-mcmc.
+    mcmc_prefix: string, optional
+        File prefix for mcmc output.
+        
     Returns
     -------
     results : dict
@@ -54,7 +64,8 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
     """
 
     import subprocess
-    cmd = "imfit '"+img_fn+"' -c "+config_fn+" "
+    cmd = 'imfit-mcmc ' if mcmc else 'imfit ' 
+    cmd += "'"+img_fn+"' -c "+config_fn+" "
     if mask_fn is not None:
         cmd += "--mask '"+mask_fn+"' "
     if var_fn is not None:
@@ -65,6 +76,9 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
         cmd += '--poisson-mlr '
     if quiet:
         cmd += '--quiet '
+    if cashstat:
+        cmd += '--cashstat '
+    cmd += options+' '
     if save_model:
         save_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
         save_fn += '_model.fits'
@@ -73,7 +87,8 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
         res_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
         res_fn += '_res.fits'
         cmd += '--save-residual '+res_fn+' '
-    cmd += '--save-params '+out_fn
+    if not mcmc:
+        cmd += '--save-params '+out_fn
     if config is not None:
         write_config(config_fn, config)
     subprocess.call(cmd, shell=True)
@@ -150,13 +165,18 @@ def read_results(fn, model='sersic'):
     file.close()
     comments = [l for l in lines if l[0]=='#']
     params = [l for l in lines if l[0]!='#' if l[:2]!='\n' if l[0]!='F']
-    reduced_chisq = float([c for c in comments if 
-                           c.split()[1]=='Reduced'][0].split()[-1])
-    results = {'reduced_chisq': float(reduced_chisq)}
+
+    results = {}
+
+    reduced_chisq = [c for c in comments if 
+                     c.split()[1]=='Reduced'][0].split()[-1]
+    if reduced_chisq != 'none':
+        results['reduced_chisq'] =float(reduced_chisq)
+
     if model=='sersic':
         for i in range(7):
-            results.update({SERSIC_PARAMS[i]: 
-                            float(params[i].split()[1])})
-            results.update({SERSIC_PARAMS[i]+'_err':
-                            float(params[i].split()[4])})
+            results[SERSIC_PARAMS[i]] = float(params[i].split()[1])
+            if len(params[i].split())==4:
+                results[SERSIC_PARAMS[i]+'_err'] = float(params[i].split()[4])
+
     return results
