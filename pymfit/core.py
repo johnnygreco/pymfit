@@ -15,7 +15,8 @@ SERSIC_PARAMS = ['X0', 'Y0', 'PA', 'ell', 'n', 'I_e', 'r_e']
 def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,  
         save_res=False, out_fn='bestfit_imfit_params.dat', config=None, 
         psf_fn=None, poisson_mlr=False, quiet=False, cashstat=False,
-        options='', mcmc=False, mcmc_prefix='mcmc-out-'):
+        mcmc=False, mcmc_prefix='mcmc_out', bootstrap=0, bootstrap_fn=None,
+        options=''):
     """
     Run imfit.
 
@@ -48,13 +49,17 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
         vaules during the fitting process.
     cashstat: bool, optional
         If True, Use Cash statistic instead of chi^2
-    options: string, optional
-        Additional command-line options. Can be anything imfit takes.
-        e.g., '--max-threads 5 --seed 341 --quiet'
     mcmc: bool, optional
         Run imfit-mcmc.
     mcmc_prefix: string, optional
         File prefix for mcmc output.
+    bootstrap: int, optional
+        Number of iterations for bootstrap resampling.
+    bootstrap_fn: str, optional
+        Save all bootstrap best-fit parameters to specified file.
+    options: string, optional
+        Additional command-line options. Can be anything imfit takes.
+        e.g., '--max-threads 5 --seed 341 --quiet'
         
     Returns
     -------
@@ -78,6 +83,11 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
         cmd += '--quiet '
     if cashstat:
         cmd += '--cashstat '
+    if bootstrap:
+        cmd += '--bootstrap {} '.format(bootstrap)
+        if bootstrap_fn:
+            cmd += '--save-bootstrap {} '.format(bootstrap_fn)
+
     cmd += options+' '
     if save_model:
         save_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
