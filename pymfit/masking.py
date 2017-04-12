@@ -8,6 +8,7 @@ import numpy as np
 import scipy.ndimage as ndimage
 from astropy.io import fits
 from astropy.convolution import Gaussian2DKernel
+from astropy import __version__ as astropy_ver
 import sep
 
 try: 
@@ -70,11 +71,13 @@ def get_hsc_pipe_mask(mask, gal_pos):
     i, j = int(gal_pos[1]), int(gal_pos[0])
     det[det==det[i, j]] = 0
 
-    bitmask_thresh = afwDetect.Threshold(
-        mask.getPlaneBitMask(['BRIGHT_OBJECT']), afwDetect.Threshold.BITMASK)
-
-    fpset = afwDetect.FootprintSet(mask, bitmask_thresh)
-    bright = fpset.insertIntoImage(True).getArray().copy()
+    if 'BRIGHT_OBJECT' in mask.getMaskPlaneDict().keys():
+        bitmask_thresh = afwDetect.Threshold(
+            mask.getPlaneBitMask(['BRIGHT_OBJECT']), afwDetect.Threshold.BITMASK)
+        fpset = afwDetect.FootprintSet(mask, bitmask_thresh)
+        bright = fpset.insertIntoImage(True).getArray().copy()
+    else:
+        bright = np.zeros_like(det)
 
     photo_mask = ((det>0) | (bright>0)).astype(int)
 
@@ -277,9 +280,9 @@ def make_mask(image, thresh=1.5, backsize=50, backffrac=0.5,
     """
 
     if LSST_IMPORTED:
-        if type(image) == lsst.afw.image.MaskedImageF:
-            img = masked_image.getImage().getArray().copy()
-            mask = masked_image.getMask().getArray().copy()
+        if type(image) == afwImage.MaskedImageF:
+            img = image.getImage().getArray().copy()
+            mask = image.getMask().getArray().copy()
         else:
             img = image
             mask = None
@@ -298,8 +301,8 @@ def make_mask(image, thresh=1.5, backsize=50, backffrac=0.5,
     #################################################################
 
     if LSST_IMPORTED:
-        if type(image) == lsst.afw.image.MaskedImageF:
-            hsc_bad_mask = get_hsc_pipe_mask(masked_image.getMask(), gal_pos)
+        if type(image) == afwImage.MaskedImageF:
+            hsc_bad_mask = get_hsc_pipe_mask(image.getMask(), gal_pos)
         else:
             hsc_bad_mask = np.zeros_like(img, dtype=bool)
     else:
@@ -336,6 +339,10 @@ def make_mask(image, thresh=1.5, backsize=50, backffrac=0.5,
     final_mask = (seg_mask | obj_mask | hsc_bad_mask).astype(int)
 
     if out_fn is not None:
-        fits.writeto(out_fn, final_mask, overwrite=True)
+        if int(astropy_ver.split('.')[1]) < 3:
+            kws = dict(clobber=True)
+        else:
+            kws = dict(overwrite=True)
+        fits.writeto(out_fn, final_mask, **kws)
 
     return final_mask
