@@ -16,7 +16,7 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
         save_res=False, out_fn='bestfit_imfit_params.dat', config=None, 
         psf_fn=None, poisson_mlr=False, quiet=False, cashstat=False,
         mcmc=False, mcmc_prefix='mcmc_out', bootstrap=0, bootstrap_fn=None,
-        options=''):
+        mcmc_kws={}, options=''):
     """
     Run imfit.
 
@@ -57,38 +57,55 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
         Number of iterations for bootstrap resampling.
     bootstrap_fn: str, optional
         Save all bootstrap best-fit parameters to specified file.
+    mcmc_kws: dict, optional
+        Keyword arguments for imfit-mcmc, which includes nchains, 
+        max-chain-length, burnin-length, gelman-rubin-limit, uniform-offset, 
+        and gaussian-offset. 
     options: string, optional
         Additional command-line options. Can be anything imfit takes.
         e.g., '--max-threads 5 --seed 341 --quiet'
         
     Returns
     -------
-    results : dict
+    results : dict, if mcmc = False
         Imfit's best-fit parameters and the reduced chi-square
         value of the fit. 
     """
 
     import subprocess
+
+    # main imfit of imfit-mcmc call
     cmd = 'imfit-mcmc ' if mcmc else 'imfit ' 
     cmd += "'"+img_fn+"' -c "+config_fn+" "
+
+    # add mask, variance, and/or psf files if given
     if mask_fn is not None:
         cmd += "--mask '"+mask_fn+"' "
     if var_fn is not None:
         cmd += "--noise '"+var_fn+"' --errors-are-variances "
     if psf_fn is not None:
         cmd += "--psf '"+psf_fn+"' "
+    
+    # different statistics options
     if poisson_mlr:
         cmd += '--poisson-mlr '
-    if quiet:
-        cmd += '--quiet '
     if cashstat:
         cmd += '--cashstat '
+
+    # limit imfit's output
+    if quiet:
+        cmd += '--quiet '
+
+    # bootstrap resampling and optional output file
     if bootstrap:
         cmd += '--bootstrap {} '.format(bootstrap)
         if bootstrap_fn:
             cmd += '--save-bootstrap {} '.format(bootstrap_fn)
 
+    # any last imfit options not included above
     cmd += options+' '
+
+    # save model and/or residual image(s) 
     if save_model:
         save_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
         save_fn += '_model.fits'
@@ -97,13 +114,24 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
         res_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
         res_fn += '_res.fits'
         cmd += '--save-residual '+res_fn+' '
+
+    # best-fit param file or mcmc file name prefix
     if not mcmc:
         cmd += '--save-params '+out_fn
+    else:
+        cmd += '--output '+mcmc_prefix+' '
+        # additional mcmc options
+        for k, v in mcmc_kws.items():
+            cmd += '--{} {} '.format(k, v)
+
+    # create config file if needed
     if config is not None:
         write_config(config_fn, config)
+
+    # run imfit
     subprocess.call(cmd, shell=True)
-    results = read_results(out_fn)
-    return results
+
+    return None if mcmc else read_results(out_fn)
 
 
 def write_config(fn, param_dict):
