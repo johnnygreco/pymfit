@@ -12,7 +12,7 @@ __all__ = ['SERSIC_PARAMS', 'run', 'write_config', 'read_results']
 SERSIC_PARAMS = ['X0', 'Y0', 'PA', 'ell', 'n', 'I_e', 'r_e']
 
 
-def run(img_fn, config_fn, mask_fn=None, noise_fn=None, variance=True, save_model=False,
+def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False, save_model=False,
         save_res=False, out_fn='bestfit_imfit_params.dat', config=None,
         psf_fn=None, poisson_mlr=False, quiet=False, cashstat=False,
         mcmc=False, mcmc_prefix='mcmc_out', bootstrap=0, bootstrap_fn=None,
@@ -29,10 +29,10 @@ def run(img_fn, config_fn, mask_fn=None, noise_fn=None, variance=True, save_mode
     mask_fn : string, optional
         Mask fits file with 0 for good pixels and
         >1 for bad pixels.
-    noise_fn : string, optional
+    var_fn : string, optional
         Noise image fits file name. Either variance or sigma image
-    variance : bool, optional
-        If True, treat the noise image as variance; otherwise treat it as sigma image
+    sigma : bool, optional
+        If True, treat the noise image as sigma map; otherwise treat it as variance image
     save_model : bool, optional
         If True, save the model fits image.
     save_res : bool, optional
@@ -83,8 +83,8 @@ def run(img_fn, config_fn, mask_fn=None, noise_fn=None, variance=True, save_mode
     # add mask, variance, and/or psf files if given
     if mask_fn is not None:
         cmd += "--mask '"+mask_fn+"' "
-    if noise_fn is not None:
-        if variance:
+    if var_fn is not None:
+        if not sigma:
             cmd += "--noise '"+noise_fn+"' --errors-are-variances "
         else:
             cmd += "--noise '"+noise_fn+"'  "
