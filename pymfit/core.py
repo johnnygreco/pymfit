@@ -85,9 +85,9 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False, save_model=Fa
         cmd += "--mask '"+mask_fn+"' "
     if var_fn is not None:
         if not sigma:
-            cmd += "--noise '"+noise_fn+"' --errors-are-variances "
+            cmd += "--noise '"+var_fn+"' --errors-are-variances "
         else:
-            cmd += "--noise '"+noise_fn+"'  "
+            cmd += "--noise '"+var_fn+"'  "
     if psf_fn is not None:
         cmd += "--psf '"+psf_fn+"' "
 
