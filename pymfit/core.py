@@ -12,8 +12,8 @@ __all__ = ['SERSIC_PARAMS', 'run', 'write_config', 'read_results']
 SERSIC_PARAMS = ['X0', 'Y0', 'PA', 'ell', 'n', 'I_e', 'r_e']
 
 
-def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,  
-        save_res=False, out_fn='bestfit_imfit_params.dat', config=None, 
+def run(img_fn, config_fn, mask_fn=None, noise_fn=None, variance=True, save_model=False,
+        save_res=False, out_fn='bestfit_imfit_params.dat', config=None,
         psf_fn=None, poisson_mlr=False, quiet=False, cashstat=False,
         mcmc=False, mcmc_prefix='mcmc_out', bootstrap=0, bootstrap_fn=None,
         mcmc_kws={}, options=''):
@@ -27,10 +27,12 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
     config_fn : string
         The configuration file name.
     mask_fn : string, optional
-        Mask fits file with 0 for good pixels and 
+        Mask fits file with 0 for good pixels and
         >1 for bad pixels.
-    var_fn : string, optional
-        Variance map fits file name. 
+    noise_fn : string, optional
+        Noise image fits file name. Either variance or sigma image
+    variance : bool, optional
+        If True, treat the noise image as variance; otherwise treat it as sigma image
     save_model : bool, optional
         If True, save the model fits image.
     save_res : bool, optional
@@ -38,7 +40,7 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
     out_fn : string, optional
         Output file name for best-fit params.
     config : dict, optional
-        Configuration parameters to be written to config_fn. If None, 
+        Configuration parameters to be written to config_fn. If None,
         will assume config_fn already exists.
     psf_fn : str, optional
         PSF fits file.
@@ -58,34 +60,37 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
     bootstrap_fn: str, optional
         Save all bootstrap best-fit parameters to specified file.
     mcmc_kws: dict, optional
-        Keyword arguments for imfit-mcmc, which includes nchains, 
-        max-chain-length, burnin-length, gelman-rubin-limit, uniform-offset, 
-        and gaussian-offset. 
+        Keyword arguments for imfit-mcmc, which includes nchains,
+        max-chain-length, burnin-length, gelman-rubin-limit, uniform-offset,
+        and gaussian-offset.
     options: string, optional
         Additional command-line options. Can be anything imfit takes.
         e.g., '--max-threads 5 --seed 341 --quiet'
-        
+
     Returns
     -------
     results : dict, if mcmc = False
         Imfit's best-fit parameters and the reduced chi-square
-        value of the fit. 
+        value of the fit.
     """
 
     import subprocess
 
     # main imfit of imfit-mcmc call
-    cmd = 'imfit-mcmc ' if mcmc else 'imfit ' 
+    cmd = 'imfit-mcmc ' if mcmc else 'imfit '
     cmd += "'"+img_fn+"' -c "+config_fn+" "
 
     # add mask, variance, and/or psf files if given
     if mask_fn is not None:
         cmd += "--mask '"+mask_fn+"' "
-    if var_fn is not None:
-        cmd += "--noise '"+var_fn+"' --errors-are-variances "
+    if noise_fn is not None:
+        if variance:
+            cmd += "--noise '"+noise_fn+"' --errors-are-variances "
+        else:
+            cmd += "--noise '"+noise_fn+"'  "
     if psf_fn is not None:
         cmd += "--psf '"+psf_fn+"' "
-    
+
     # different statistics options
     if poisson_mlr:
         cmd += '--poisson-mlr '
@@ -105,7 +110,7 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
     # any last imfit options not included above
     cmd += options+' '
 
-    # save model and/or residual image(s) 
+    # save model and/or residual image(s)
     if save_model:
         save_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
         save_fn += '_model.fits'
@@ -136,12 +141,12 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, save_model=False,
 
 def write_config(fn, param_dict):
     """
-    Write imfit config file. At the moment, I am 
-    only using Sersic models. 
+    Write imfit config file. At the moment, I am
+    only using Sersic models.
 
     Parameters
     ----------
-    fn : string 
+    fn : string
         Config file name.
     param_dict : dict
         Imfit initial parameters and optional limits.
@@ -149,10 +154,10 @@ def write_config(fn, param_dict):
     Notes
     -----
     Example format for the parameter dictionary:
-    param_dict = {'X0':[330, 300, 360], 'Y0':[308, 280, 340], 
-                  'PA':18.0, 'ell':[0.2,0,1], 'n':[1.0, 'fixed'], 
+    param_dict = {'X0':[330, 300, 360], 'Y0':[308, 280, 340],
+                  'PA':18.0, 'ell':[0.2,0,1], 'n':[1.0, 'fixed'],
                   'I_e':15, 'r_e':25}
-    Limits are given as a list: [val, val_min, val_max]. If the 
+    Limits are given as a list: [val, val_min, val_max]. If the
     parameter should be fixed, use [val, 'fixed'].
     """
 
@@ -181,7 +186,7 @@ def write_config(fn, param_dict):
 
 def read_results(fn, model='sersic'):
     """
-    Read the output results file from imfit. 
+    Read the output results file from imfit.
 
     Parameters
     ----------
@@ -193,8 +198,8 @@ def read_results(fn, model='sersic'):
     Returns
     -------
     results : dict
-        Imfit best-fit results and reduced chi-square 
-        value. For Sersic fits, the parameters are 
+        Imfit best-fit results and reduced chi-square
+        value. For Sersic fits, the parameters are
         ['X0', 'Y0', 'PA', 'ell', 'n', 'I_e', 'r_e'].
     """
 
@@ -206,7 +211,7 @@ def read_results(fn, model='sersic'):
 
     results = {}
 
-    reduced_chisq = [c for c in comments if 
+    reduced_chisq = [c for c in comments if
                      c.split()[1]=='Reduced'][0].split()[-1]
     if reduced_chisq != 'none':
         results['reduced_chisq'] =float(reduced_chisq)
