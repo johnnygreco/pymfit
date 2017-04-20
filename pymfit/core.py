@@ -12,11 +12,11 @@ __all__ = ['SERSIC_PARAMS', 'run', 'write_config', 'read_results']
 SERSIC_PARAMS = ['X0', 'Y0', 'PA', 'ell', 'n', 'I_e', 'r_e']
 
 
-def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False, save_model=False,
-        save_res=False, out_fn='bestfit_imfit_params.dat', config=None,
-        psf_fn=None, poisson_mlr=False, quiet=False, cashstat=False,
-        mcmc=False, mcmc_prefix='mcmc_out', bootstrap=0, bootstrap_fn=None,
-        mcmc_kws={}, options=''):
+def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False, 
+        save_model=False, save_res=False, out_fn='bestfit_imfit_params.dat', 
+        config=None, psf_fn=None, poisson_mlr=False, quiet=False, 
+        cashstat=False, mcmc=False, mcmc_prefix='mcmc_out', bootstrap=0, 
+        bootstrap_fn=None, mcmc_kws={}, options=''):
     """
     Run imfit.
 
@@ -32,7 +32,8 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False, save_model=Fa
     var_fn : string, optional
         Noise image fits file name. Either variance or sigma image
     sigma : bool, optional
-        If True, treat the noise image as sigma map; otherwise treat it as variance image
+        If True, treat the noise image as sigma map; otherwise 
+        treat it as variance image
     save_model : bool, optional
         If True, save the model fits image.
     save_res : bool, optional
