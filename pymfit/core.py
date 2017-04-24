@@ -4,6 +4,7 @@ Some tools for running imfit and reading its outputs.
 from __future__ import division, print_function
 
 import os
+import subprocess
 
 __all__ = ['SERSIC_PARAMS', 'run', 'write_config', 'read_results']
 
@@ -16,7 +17,7 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
         save_model=False, save_res=False, out_fn='bestfit_imfit_params.dat', 
         config=None, psf_fn=None, poisson_mlr=False, quiet=False, 
         cashstat=False, mcmc=False, mcmc_prefix='mcmc_out', bootstrap=0, 
-        bootstrap_fn=None, mcmc_kws={}, options=''):
+        bootstrap_fn=None, mcmc_kws={}, options='', pymfitter=False):
     """
     Run imfit.
 
@@ -67,6 +68,8 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
     options: string, optional
         Additional command-line options. Can be anything imfit takes.
         e.g., '--max-threads 5 --seed 341 --quiet'
+    pymfitter: bool, optional
+        If True, run is being called from a PymFitter instance.
 
     Returns
     -------
@@ -74,8 +77,6 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
         Imfit's best-fit parameters and the reduced chi-square
         value of the fit.
     """
-
-    import subprocess
 
     # main imfit of imfit-mcmc call
     cmd = 'imfit-mcmc ' if mcmc else 'imfit '
@@ -137,7 +138,8 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
     # run imfit
     subprocess.call(cmd, shell=True)
 
-    return None if mcmc else read_results(out_fn)
+    if not pymfitter:
+        return None if mcmc else read_results(out_fn)
 
 
 def write_config(fn, param_dict):
