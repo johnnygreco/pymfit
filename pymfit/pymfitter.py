@@ -50,7 +50,7 @@ class PymFitter(object):
                                    if l[0]!='F' if l[:2]!='X0'\
                                    if l[:2]!='Y0']
         cen_text = [l for l in lines if l[0]!='#'\
-									 if (l[:2]=='X0' or l[:2]=='Y0')]
+                                     if (l[:2]=='X0' or l[:2]=='Y0')]
         centers = []
         
         for i in range(len(cen_text)//2):
@@ -156,8 +156,8 @@ class PymFitter(object):
             mask = fits.getdata(self.mask_fn)
             mask = mask.astype(float)
             mask[mask==0.0] = np.nan
-            axes[0].imshow(mask, origin='lower', alpha=0.4, 
-						   vmin=0, vmax=1, cmap='rainbow_r')
+            axes[0].imshow(mask, origin='lower', alpha=0.4,
+                           vmin=0, vmax=1, cmap='rainbow_r')
 
         if show:
             plt.show()
