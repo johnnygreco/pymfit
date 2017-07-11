@@ -51,12 +51,14 @@ class PymFitter(object):
                                    if l[:2]!='Y0']
         cen_text = [l for l in lines if l[0]!='#'\
                                      if (l[:2]=='X0' or l[:2]=='Y0')]
+
         centers = []
         
         for i in range(len(cen_text)//2):
-            _, x0 = cen_text[i].split()[:2]
-            _, y0 = cen_text[i+1].split()[:2]
-            centers.append([float(x0), float(y0)])
+            _, x0, _, _, xerr = cen_text[i].split()
+            _, y0, _, _, yerr  = cen_text[i+1].split()
+            pos_list = [float(x0), float(y0), float(xerr), float(yerr)]
+            centers.append(pos_list)
 
         par_num = 0
         cen_num = -1
@@ -69,11 +71,15 @@ class PymFitter(object):
                 cen_num += 1
             self.results['comp_'+str(i+1)]['X0'] = centers[cen_num][0]
             self.results['comp_'+str(i+1)]['Y0'] = centers[cen_num][1]
+            self.results['comp_'+str(i+1)]['X0_err'] = centers[cen_num][2]
+            self.results['comp_'+str(i+1)]['Y0_err'] = centers[cen_num][3]
     
             for par in comp.param_names:
                 name, val = params[par_num].split()[:2]
+                err = params[par_num].split()[-1]
                 assert name==par
                 self.results['comp_'+str(i+1)].update({par: float(val)})
+                self.results['comp_'+str(i+1)].update({par+'_err': float(err)})
                 par_num+=1
 
     def print_results(self):
@@ -91,7 +97,7 @@ class PymFitter(object):
             
     def run(self, img_fn, mask_fn=None, var_fn=None, psf_fn=None,
             config_fn='config.txt', out_fn='best-fit.txt', will_viz=False,
-            outdir='.', run_kws={}):
+            outdir='.', save_model=False, save_residual=False, run_kws={}):
 
         config_fn = os.path.join(outdir, config_fn)
         out_fn = os.path.join(outdir, out_fn)
@@ -99,8 +105,9 @@ class PymFitter(object):
         self.out_fn = out_fn
         self.mask_fn = mask_fn
 
-        if will_viz:
+        if will_viz or save_model:
             run_kws['save_model'] = True
+        if will_viz or save_residual:
             run_kws['save_res'] = True
         run(img_fn, config_fn, mask_fn=mask_fn, var_fn=var_fn, 
             out_fn=out_fn, psf_fn=psf_fn, pymfitter=True, **run_kws)
@@ -117,8 +124,9 @@ class PymFitter(object):
         if not self.save_files:
             os.remove(out_fn)
             os.remove(config_fn)
-            if will_viz:
+            if will_viz and save_model: 
                 os.remove(model_fn)
+            if will_viz and save_residual: 
                 os.remove(res_fn)
 
     def viz_results(self, subplots=None, show=True, save_fn=None, 
