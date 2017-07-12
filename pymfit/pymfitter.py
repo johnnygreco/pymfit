@@ -113,20 +113,21 @@ class PymFitter(object):
             out_fn=out_fn, psf_fn=psf_fn, pymfitter=True, **run_kws)
         self.read_results()
 
+        self.img_fn = img_fn[:-3] if img_fn[-1]==']' else img_fn
+        self.res_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
+        self.res_fn += '_res.fits'
+        self.model_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
+        self.model_fn += '_model.fits'
+
         if will_viz:
-            self.img_fn = img_fn[:-3] if img_fn[-1]==']' else img_fn
-            model_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
-            model_fn += '_model.fits'
             self.model_arr = fits.getdata(model_fn)
-            res_fn = img_fn[:-8] if img_fn[-1]==']' else img_fn[:-5]
-            res_fn += '_res.fits'
             self.res_arr = fits.getdata(res_fn)
         if not self.save_files:
             os.remove(out_fn)
             os.remove(config_fn)
-            if will_viz and save_model: 
+            if will_viz and not save_model: 
                 os.remove(model_fn)
-            if will_viz and save_residual: 
+            if will_viz and not save_residual: 
                 os.remove(res_fn)
 
     def viz_results(self, subplots=None, show=True, save_fn=None, 

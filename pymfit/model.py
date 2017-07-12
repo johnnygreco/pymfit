@@ -49,7 +49,11 @@ param_names = {
 def _check_kwargs_defaults(kwargs, defaults):
     kw = defaults.copy()
     for k, v in kwargs.items():
-        kw[k] = v
+        if type(v)==list:
+            if v[0] is not None:
+                kw[k] = v
+        elif v is not None:
+            kw[k] = v
     return kw
 
 
