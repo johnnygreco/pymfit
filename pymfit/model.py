@@ -203,9 +203,11 @@ class Model(object):
         zipper = zip(funcs, params, centers)	
         for num, (func, pars, center) in enumerate(zipper):
             if center:
-                if dcent != 'fixed':
-                    center[0] = [center[0], center[0]-dcent, center[0]+dcent]
-                    center[1] = [center[1], center[1]-dcent, center[1]+dcent]
+                if (dcent != 'fixed') and (dcent != 0):
+                    min_x = center[0]-dcent if center[0]-dcent > 0  else 1
+                    min_y = center[1]-dcent if center[1]-dcent > 0  else 1
+                    center[0] = [center[0], min_x, center[0]+dcent]
+                    center[1] = [center[1], min_y, center[1]+dcent]
                 else:
                     center[0] = [center[0], 'fixed']
                     center[1] = [center[1], 'fixed']
