@@ -64,8 +64,9 @@ class Sersic(object):
         a, b = self.r_e, (1 - self.ell) * self.r_e
         theta = self.theta*np.pi/180.0
         cos_theta, sin_theta = np.cos(theta), np.sin(theta)
-        x_maj = (x - self.X0) * cos_theta + (y - self.Y0) * sin_theta
-        x_min = -(x - self.X0) * sin_theta + (y - self.Y0) * cos_theta
+
+        x_maj = (x - (self.X0 - 1)) * cos_theta + (y - (self.Y0 - 1)) * sin_theta
+        x_min = -(x - (self.X0 - 1)) * sin_theta + (y - (self.Y0 - 1)) * cos_theta
         z = np.sqrt((x_maj/a) ** 2 + (x_min/b) ** 2)
         img = self.I_e* np.exp(-self.b_n * (z ** (1/self.n) - 1))
         return img

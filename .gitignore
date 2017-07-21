@@ -93,3 +93,6 @@ ENV/
 .ipynb_checkpoints
 .DS_Store
 local_data
+
+# emacs auto-save
+*~
