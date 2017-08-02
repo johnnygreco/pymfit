@@ -1,5 +1,6 @@
 from __future__ import division, print_function
 
+import copy
 from .core import SERSIC_PARAMS,AVAILABLE_FUNCS
 from .configs import DEFAULT_SERSIC
 
@@ -50,10 +51,11 @@ class MultiComponentModel ( object ):
         if funcname not in AVAILABLE_FUNCS:
             raise NotImplementedError ( '{0} not implemented in pymfit.'.format(funcname) )
 
-        imfit_config = globals()['DEFAULT_{0}'.format(funcname.upper())]
+        imfit_config = copy.copy ( globals()['DEFAULT_{0}'.format(funcname.upper())] )
         for k,v in init_params.items():
             imfit_config[k] = v  
 
+        assert objnumber < self.nobjects, "No object #{0} in model.".format(objnumber)
         self.config_tree [ objnumber ].add_component ( funcname, imfit_config )
         
 
@@ -64,8 +66,7 @@ class ModelContainer ( object ):
     """
     def __init__ ( self, object_number, object_position ):
         self.object_number = object_number
-        self.X0 = object_position[0]
-        self.Y0 = object_position[1]
+        self.position = dict ( zip (['X0','Y0'], object_position ) )
         self.ncomponents = 0
         self.component_nests = {}
 

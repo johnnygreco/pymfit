@@ -6,7 +6,7 @@ from __future__ import division, print_function
 import os
 import subprocess
 
-__all__ = ['SERSIC_PARAMS', 'run', 'write_config', 'read_results']
+__all__ = ['SERSIC_PARAMS', 'run', 'write_config', 'write_multicompconfig', 'read_results']
 
 # add list of imfit functions that are available
 AVAILABLE_FUNCS = ['Sersic']
@@ -151,9 +151,20 @@ def write_multicompconfig ( fn, mcmodel ):
     '''
     fileobj = open ( fn, 'w' )
 
-    for objid in range(mcmodel.nobjects):
-        pass
+    for oid in range(mcmodel.nobjects):
+        for key in ['X0','Y0']:
+            val,lo,hi = mcmodel.config_tree[oid].position[key]
+            print ( key, val, str(lo)+','+str(hi), file=fileobj )
+            
+        for cid in range(mcmodel.config_tree[oid].ncomponents):
+            function, component = mcmodel.config_tree[oid][cid]
+            print ( 'FUNCTION ' + function, file=fileobj )
+            write_component ( fileobj, function, component )
+        print ('\n', file=fileobj) 
 
+    fileobj.close ()
+
+        
 def write_config(fn, param_dict):
     """
     Write imfit config file. At the moment, I am
@@ -179,7 +190,7 @@ def write_config(fn, param_dict):
     file = write_component ( file, fn, param_dict )
     file.close()
 
-def write_component ( fileobj, function, fn, param_dict ): 
+def write_component ( fileobj, function, param_dict ): 
     """
     Write one component of a config file.
 
@@ -199,10 +210,13 @@ def write_component ( fileobj, function, fn, param_dict ):
     Limits are given as a list: [val, val_min, val_max]. If the
     parameter should be fixed, use [val, 'fixed'].
     """
-
+    fn = fileobj.name
+                              
     for p in SERSIC_PARAMS:
         val = param_dict[p]
-        if type(val) is list:
+        if val is None:
+            continue
+        elif type(val) is list:
             if len(val)==1:
                 val, limit = val[0], ''
             elif len(val)==2:
