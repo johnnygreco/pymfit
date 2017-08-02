@@ -8,6 +8,8 @@ import subprocess
 
 __all__ = ['SERSIC_PARAMS', 'run', 'write_config', 'read_results']
 
+# add list of imfit functions that are available
+AVAILABLE_FUNCS = ['Sersic']
 
 # do not change parameter order
 SERSIC_PARAMS = ['X0', 'Y0', 'PA', 'ell', 'n', 'I_e', 'r_e']
@@ -141,6 +143,16 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
     if not pymfitter:
         return None if mcmc else read_results(out_fn)
 
+def write_multicompconfig ( fn, mcmodel ):
+    '''
+    Write imfit config file from a MultiComponentModel object.
+
+
+    '''
+    fileobj = open ( fn, 'w' )
+
+    for objid in range(mcmodel.nobjects):
+        pass
 
 def write_config(fn, param_dict):
     """
@@ -163,9 +175,31 @@ def write_config(fn, param_dict):
     Limits are given as a list: [val, val_min, val_max]. If the
     parameter should be fixed, use [val, 'fixed'].
     """
-
-    function = 'Sersic'
     file = open(fn, 'w')
+    file = write_component ( file, fn, param_dict )
+    file.close()
+
+def write_component ( fileobj, function, fn, param_dict ): 
+    """
+    Write one component of a config file.
+
+    Parameters
+    ----------
+    fn : string
+        Config file name.
+    param_dict : dict
+        Imfit initial parameters and optional limits.
+
+    Notes
+    -----
+    Example format for the parameter dictionary:
+    param_dict = {'X0':[330, 300, 360], 'Y0':[308, 280, 340],
+                  'PA':18.0, 'ell':[0.2,0,1], 'n':[1.0, 'fixed'],
+                  'I_e':15, 'r_e':25}
+    Limits are given as a list: [val, val_min, val_max]. If the
+    parameter should be fixed, use [val, 'fixed'].
+    """
+
     for p in SERSIC_PARAMS:
         val = param_dict[p]
         if type(val) is list:
@@ -181,11 +215,12 @@ def write_config(fn, param_dict):
                 raise Exception('Invalid parameter definition.')
         else:
             limit = ''
-        print(p, val, limit, file=file)
+        print(p, val, limit, file=fileobj)
         if p=='Y0':
-            print('FUNCTION Sersic', file=file)
-    file.close()
+            print('FUNCTION ' + function, file=fileobj)
 
+    return fileobj
+   
 
 def read_results(fn, model='sersic'):
     """
