@@ -6,10 +6,12 @@ from __future__ import division, print_function
 import os
 import subprocess
 
-__all__ = ['SERSIC_PARAMS', 'run', 'write_config', 'write_multicompconfig', 'read_results']
+__all__ = ['SERSIC_PARAMS', 'run', 'write_config', 'write_multicomponentconfig', 'read_results',
+           'read_multicomponentresults' ]
 
 # add list of imfit functions that are available
 AVAILABLE_FUNCS = ['Sersic']
+
 
 # do not change parameter order
 SERSIC_PARAMS = ['X0', 'Y0', 'PA', 'ell', 'n', 'I_e', 'r_e']
@@ -143,7 +145,7 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
     if not pymfitter:
         return None if mcmc else read_results(out_fn)
 
-def write_multicompconfig ( fn, mcmodel ):
+def write_multicomponentconfig ( fn, mcmodel ):
     '''
     Write imfit config file from a MultiComponentModel object.
 
@@ -159,6 +161,8 @@ def write_multicompconfig ( fn, mcmodel ):
         for cid in range(mcmodel.config_tree[oid].ncomponents):
             function, component = mcmodel.config_tree[oid][cid]
             print ( 'FUNCTION ' + function, file=fileobj )
+            component['X0'] = None
+            component['Y0'] = None
             write_component ( fileobj, function, component )
         print ('\n', file=fileobj) 
 
@@ -187,7 +191,7 @@ def write_config(fn, param_dict):
     parameter should be fixed, use [val, 'fixed'].
     """
     file = open(fn, 'w')
-    file = write_component ( file, fn, param_dict )
+    file = write_component ( file, 'Sersic', param_dict )
     file.close()
 
 def write_component ( fileobj, function, param_dict ): 
@@ -235,7 +239,57 @@ def write_component ( fileobj, function, param_dict ):
 
     return fileobj
    
+def read_multicomponentresults ( fn ):
+    '''
+    Read an imfit results file for a multicomponent model.
+    '''
+    import re
+    from .multicomponent import MultiComponentResults
+    
+    fileobj = open ( fn, 'r' )
+    lines = fileobj.readlines ()
+    fileobj.close()
+    comments = [l for l in lines if l[0]=='#']
 
+    mcres = MultiComponentResults ()
+
+    reduced_chisq = [c for c in comments if
+                     c.split()[1]=='Reduced'][0].split()[-1]
+    mcres.reduced_chisq = float(reduced_chisq) 
+
+    i=0
+    while i < len(lines):
+        if len(lines[i].split ()) == 0:
+            i+=1
+        elif lines[i][0] == '#':
+            i+= 1
+        elif 'X0' in lines[i]:
+            _,x0,x0_err = __parse_line ( lines[i] )
+            _,y0,y0_err = __parse_line ( lines[i+1] )
+            funcname = re.findall ("(?<=FUNCTION ).*" , lines[i+2] )[0]
+            mcres.add_object ( x0, x0_err, y0, y0_err )
+            mcres.add_function ( mcres.nobjects-1, funcname )
+            i += 3
+        elif re.match("FUNCTION .*" , lines[i]):
+            funcname = re.findall ("(?<=FUNCTION ).*" , lines[i] )[0]
+            mcres.add_function ( mcres.nobjects-1, funcname )
+            i += 1
+        else:
+            mcres.add_parameter ( mcres.nobjects-1,
+                                  mcres.config_tree[mcres.nobjects-1].ncomponents - 1,
+                                  *__parse_line ( lines[i] ) )
+            i += 1
+    return mcres
+    
+def __parse_line ( line ):
+    data = line.split ()
+    if len(data) != 5:
+        raise IndexError ("Imfit output not in expected format. Received: \n{0}".format(line))
+    name = data[0]
+    value = float(data[1])
+    error = float(data[-1])
+    return name,value,error
+    
 def read_results(fn, model='sersic'):
     """
     Read the output results file from imfit.
