@@ -118,6 +118,9 @@ class ModelContainer ( object ):
         self.ncomponents = 0
         self.component_nests = {}
 
+    def __len__ ( self ):
+        return self.ncomponents
+
     def __getitem__ ( self, key ):
         return self.component_nests[key]
 
@@ -141,6 +144,9 @@ class ResultContainer ( object ):
         self.ncomponents = 0
         self.component_nests = {}
 
+    def __len__ ( self ):
+        return self.ncomponents 
+    
     def __getitem__ ( self, key ):
         return self.component_nests[key]
 
@@ -149,7 +155,7 @@ class ResultContainer ( object ):
                    'X0_err': self.X0_err,
                    'Y0': self.Y0,
                    'Y0_err': self.Y0_err }
-        self.component_nests[self.ncomponents] = ( funcname, params )
+        self.component_nests[self.ncomponents] = ComponentNest ( ( funcname, params ) )
         self.ncomponents += 1
 
     def add_parameter ( self, name, param, param_err, component_number=None ):
@@ -158,3 +164,19 @@ class ResultContainer ( object ):
 
         self.component_nests[component_number][1][name] = param
         self.component_nests[component_number][1][name+'_err'] = param_err
+
+class ComponentNest ( object ):
+    '''
+    Quick container class to allow for direct indexing of parameters without breaking
+    previous behavior.
+    '''
+    def __init__ ( self, inptuple ):
+        self.info = inptuple
+        self.funcname = inptuple[0]
+        self.params = inptuple[1]
+
+    def __getitem__ ( self, key ):
+        if isinstance ( key, int ):
+            return self.info[key]
+        else:
+            return self.params[key]
