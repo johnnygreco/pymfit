@@ -292,9 +292,9 @@ def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
         if type(image) == afwImage.MaskedImageF:
             img = image.getImage().getArray().copy()
         else:
-            img = image
+            img = image.copy()
     else:
-        img = image
+        img = image.copy()
 
     if gal_pos=='center':
         gal_x, gal_y = (img.shape[1]/2, img.shape[0]/2)
