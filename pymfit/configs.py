@@ -44,3 +44,4 @@ def sersic_config(init_params={}, gal_pos='center', img_shape=None, delta_pos=50
         imfit_config['Y0'] = [gal_pos[1], gal_pos[1]-delta_pos,
                               gal_pos[1]+delta_pos]
     return imfit_config
+
