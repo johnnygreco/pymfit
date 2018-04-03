@@ -20,6 +20,13 @@ DEFAULT_SERSIC = OrderedDict([
     ('r_e', [20., 0., 5000])
 ])
 
+DEFAULT_EXP = OrderedDict([
+    ('PA', [20., 0., 360]),
+    ('ell', [0.2, 0., 0.99]),
+    ('I_0', [0.05, 0., 1000]),
+    ('h', [20., 0., 5000])
+])
+
 DEFAULT_GAUSS = OrderedDict([
     ('PA', [20., 0., 360]),
     ('ell', [0.2, 0., 0.99]),
@@ -33,16 +40,19 @@ DEFAULT_FLATSKY = OrderedDict([
 
 SERSIC_PARAMS = ['PA', 'ell', 'n', 'I_e', 'r_e']
 GAUSS_PARAMS = ['PA', 'ell', 'I_0', 'sigma']
+EXP_PARAMS = ['PA', 'ell', 'I_0', 'h']
 FLATSKY_PARAMS = ['I_sky']
 
 default_params = dict(Sersic=DEFAULT_SERSIC, 
                       Gaussian=DEFAULT_GAUSS,
-                      FlatSky=DEFAULT_FLATSKY)
+                      FlatSky=DEFAULT_FLATSKY, 
+                      Exponential=DEFAULT_EXP)
 
 param_names = {
     'Sersic': ['PA', 'ell', 'n', 'I_e', 'r_e'],
     'Gaussian': ['PA', 'ell', 'I_0', 'sigma'],
-    'FlatSky': ['I_sky']
+    'FlatSky': ['I_sky'],
+    'Exponential': EXP_PARAMS
 }
 
 
