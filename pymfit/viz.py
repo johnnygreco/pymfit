@@ -8,14 +8,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
 from astropy.visualization import ZScaleInterval
+from astropy.convolution import convolve
 from .sersic import Sersic
 zscale = ZScaleInterval()
 
 __all__ = ['img_mod_res']
 
 def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r, 
-                save_fn=None, show=True, band='i', subplots=None, 
-                titles=True, pixscale=0.168, **kwargs):
+                save_fn=None, show=True, band='', subplots=None, 
+                titles=True, pixscale=0.168, psf_fn=None, **kwargs):
     """
     Show imfit results: image, model, and residual.
     """
@@ -31,6 +32,12 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
 
     s = Sersic(mod_params)
     model = s.array(img.shape)
+
+    if psf_fn is not None:
+        psf = fits.getdata(psf_fn)
+        psf /= psf.sum()
+        model = convolve(model, psf)
+
     res = img - model
 
     vmin, vmax = zscale.get_limits(img)
