@@ -343,10 +343,6 @@ def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
     final_mask = (seg_mask | obj_mask | hsc_bad_mask).astype(int)
 
     if out_fn is not None:
-        if int(astropy_ver.split('.')[1]) < 3:
-            kws = dict(clobber=True)
-        else:
-            kws = dict(overwrite=True)
-        fits.writeto(out_fn, final_mask, **kws)
+        fits.writeto(out_fn, final_mask, overwrite=True)
 
     return final_mask
