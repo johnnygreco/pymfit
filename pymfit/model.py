@@ -20,6 +20,15 @@ DEFAULT_SERSIC = OrderedDict([
     ('r_e', [20., 0., 5000])
 ])
 
+DEFAULT_SERSIC_GENELLIPSE = OrderedDict([
+    ('PA', [20., 0., 360]),
+    ('ell', [0.2, 0., 0.99]),
+    ('c0', [0.0, -0.2, 0.2]),
+    ('n', [1.0, 0.01, 5]),
+    ('I_e', [0.05, 0., 1000]),
+    ('r_e', [20., 0., 5000])
+])
+
 DEFAULT_EXP = OrderedDict([
     ('PA', [20., 0., 360]),
     ('ell', [0.2, 0., 0.99]),
@@ -51,6 +60,7 @@ DEFAULT_POINTSOURCE = OrderedDict([
 ])
 
 SERSIC_PARAMS = ['PA', 'ell', 'n', 'I_e', 'r_e']
+SERSIC_GENELLIPSE_PARAMS = ['PA', 'ell', 'c0', 'n', 'I_e', 'r_e']
 GAUSS_PARAMS = ['PA', 'ell', 'I_0', 'sigma']
 EXP_PARAMS = ['PA', 'ell', 'I_0', 'h']
 FLATSKY_PARAMS = ['I_sky']
@@ -59,6 +69,7 @@ POINTSOURCE_PARAMS = ['I_tot']
 
 
 default_params = dict(Sersic=DEFAULT_SERSIC,
+                      Sersic_GenEllipse=DEFAULT_SERSIC_GENELLIPSE,
                       Gaussian=DEFAULT_GAUSS,
                       FlatSky=DEFAULT_FLATSKY,
                       Exponential=DEFAULT_EXP,
@@ -67,6 +78,7 @@ default_params = dict(Sersic=DEFAULT_SERSIC,
 
 param_names = {
     'Sersic': SERSIC_PARAMS,
+    'Sersic_GenEllipse': SERSIC_GENELLIPSE_PARAMS,
     'Gaussian': GAUSS_PARAMS,
     'FlatSky': FLATSKY_PARAMS,
     'Exponential': EXP_PARAMS,
