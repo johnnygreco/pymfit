@@ -1,15 +1,15 @@
 """
-Model and Param classes for defining arbitrary 
+Model and Param classes for defining arbitrary
 imfit models.
 """
 
 from collections import OrderedDict
 
-__all__ = ['default_params', 'param_names', 'Param', 
+__all__ = ['default_params', 'param_names', 'Param',
            'ModelComponent', 'Model']
 
 ###########################
-# Default model parameters 
+# Default model parameters
 ###########################
 
 DEFAULT_SERSIC = OrderedDict([
@@ -43,15 +43,15 @@ GAUSS_PARAMS = ['PA', 'ell', 'I_0', 'sigma']
 EXP_PARAMS = ['PA', 'ell', 'I_0', 'h']
 FLATSKY_PARAMS = ['I_sky']
 
-default_params = dict(Sersic=DEFAULT_SERSIC, 
+default_params = dict(Sersic=DEFAULT_SERSIC,
                       Gaussian=DEFAULT_GAUSS,
-                      FlatSky=DEFAULT_FLATSKY, 
+                      FlatSky=DEFAULT_FLATSKY,
                       Exponential=DEFAULT_EXP)
 
 param_names = {
-    'Sersic': ['PA', 'ell', 'n', 'I_e', 'r_e'],
-    'Gaussian': ['PA', 'ell', 'I_0', 'sigma'],
-    'FlatSky': ['I_sky'],
+    'Sersic': SERSIC_PARAMS,
+    'Gaussian': GAUSS_PARAMS,
+    'FlatSky': FLATSKY_PARAMS,
     'Exponential': EXP_PARAMS
 }
 
@@ -67,7 +67,7 @@ def _check_kwargs_defaults(kwargs, defaults):
     return kw
 
 
-def _parse_limits(lims):        
+def _parse_limits(lims):
     if type(lims)==list:
         if len(lims)==3:
             val, vmin, vmax = lims
@@ -86,10 +86,10 @@ def _parse_limits(lims):
 
 
 class Param(object):
-    
-    def __init__(self, name, value, vmin=None, vmax=None, 
-                 fixed=False, relative_limits=False):        
-        
+
+    def __init__(self, name, value, vmin=None, vmax=None,
+                 fixed=False, relative_limits=False):
+
         self.name = name
         self._value = None
         self._vmin = None
@@ -103,21 +103,21 @@ class Param(object):
         elif (vmin is not None) and (vmax is not None):
             self.vmin = vmin
             self.vmax = vmax
-        
+
     @property
     def value(self):
         return self._value
-        
+
     @value.setter
     def value(self, val):
         if (self.vmin is not None) and (self.vmax is not None):
             assert (val >= self.vmin) and (val <= self.vmax)
         self._value = val
-        
+
     @property
     def vmin(self):
         return self._vmin
-    
+
     @vmin.setter
     def vmin(self, val):
         assert (val <= self.value)
@@ -131,18 +131,18 @@ class Param(object):
     def vmax(self, val):
         assert (val >= self.value)
         self._vmax = val
-        
+
     @property
     def fixed(self):
         return self._fixed
-    
+
     @fixed.setter
     def fixed(self, val):
         self._fixed = val
         if val:
             self._vmin = None
             self._vmax = None
-            
+
     @property
     def config_line(self):
         line = '{} {} '.format(self.name, self.value)
@@ -150,54 +150,54 @@ class Param(object):
             line += 'fixed'
         elif (self.vmin is not None) and (self.vmax is not None):
             line += '{},{}'.format(self.vmin, self.vmax)
-        return line            
-    
+        return line
+
     def set_lim(self, lim):
         self.fixed = False
         if self.relative_limits:
             lim[0] = self.value - lim[0]
             lim[1] = self.value + lim[1]
         self.vmin, self.vmax = lim
-        
+
 
 class ModelComponent(object):
-    
+
     def __init__(self, name, params, center=None, **kwargs):
         self.name = name
         self.param_names = param_names[name]
-        
+
         if params:
             init_pars = _check_kwargs_defaults(params, default_params[name])
         else:
             init_pars = default_params[name]
-        
+
         self.param_dict = init_pars
 
         for k, v in init_pars.items():
             val, vmin, vmax, fixed  = _parse_limits(v)
             p = Param(k, val, vmin, vmax, fixed, **kwargs)
-            setattr(self, k, p)      
-        
+            setattr(self, k, p)
+
         if center:
             val, vmin, vmax, fixed  = _parse_limits(center[0])
             self.X0 = Param('X0', val, vmin, vmax, fixed, **kwargs)
-            
+
             val, vmin, vmax, fixed  = _parse_limits(center[1])
             self.Y0 = Param('Y0', val, vmin, vmax, fixed, **kwargs)
         else:
             self.X0 = None
             self.Y0 = None
-    
+
     def set_param(self, name, value, **kwargs):
         mess = '{} not a param of {} function'.format(name, self.name)
         assert name in self.param_names or name in ['X0', 'Y0'], mess
         val = _parse_limits(value)
         p = Param(name, *val, **kwargs)
         setattr(self, name, p)
-        
-        
+
+
 class Model(object):
-    
+
     def __init__(self, funcs, params, centers, dcent=30, **kwargs):
 
         if type(centers[0]) != list:
@@ -210,7 +210,7 @@ class Model(object):
         self.funcs = funcs
         self.ncomp = len(funcs)
 
-        zipper = zip(funcs, params, centers)	
+        zipper = zip(funcs, params, centers)
         for num, (func, pars, center) in enumerate(zipper):
             if center:
                 if (dcent != 'fixed') and (dcent != 0):
@@ -221,8 +221,8 @@ class Model(object):
                 else:
                     center[0] = [center[0], 'fixed']
                     center[1] = [center[1], 'fixed']
-            setattr(self, 'comp_'+str(num+1), 
+            setattr(self, 'comp_'+str(num+1),
                     ModelComponent(func, pars, center, **kwargs))
-            
+
     def set_comp_param(self, comp_num, param, value, **kwargs):
         getattr(self, 'comp_'+str(comp_num)).set_param(param, value, **kwargs)
