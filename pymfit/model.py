@@ -38,21 +38,32 @@ DEFAULT_FLATSKY = OrderedDict([
     ('I_sky', [0., -5, 5])
 ])
 
+DEFAULT_MOFFAT = OrderedDict([
+    ('PA', [20., 0., 360]),
+    ('ell', [0.2, 0., 0.99]),
+    ('I_0', [1.0, 0.01, 5]),
+    ('fwhm', [0.2, 0.01, 10]),
+    ('beta', [2.0, 0.1, 5])
+])
+
 SERSIC_PARAMS = ['PA', 'ell', 'n', 'I_e', 'r_e']
 GAUSS_PARAMS = ['PA', 'ell', 'I_0', 'sigma']
 EXP_PARAMS = ['PA', 'ell', 'I_0', 'h']
 FLATSKY_PARAMS = ['I_sky']
+MOFFAT_PARAMS = ['PA', 'ell', 'I_0', 'fwhm', 'beta']
 
 default_params = dict(Sersic=DEFAULT_SERSIC,
                       Gaussian=DEFAULT_GAUSS,
                       FlatSky=DEFAULT_FLATSKY,
-                      Exponential=DEFAULT_EXP)
+                      Exponential=DEFAULT_EXP,
+                      Moffat=DEFAULT_MOFFAT)
 
 param_names = {
     'Sersic': SERSIC_PARAMS,
     'Gaussian': GAUSS_PARAMS,
     'FlatSky': FLATSKY_PARAMS,
-    'Exponential': EXP_PARAMS
+    'Exponential': EXP_PARAMS,
+    'Moffat': MOFFAT_PARAMS
 }
 
 
