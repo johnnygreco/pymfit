@@ -70,7 +70,7 @@ param_names = {
 def _check_kwargs_defaults(kwargs, defaults):
     kw = defaults.copy()
     for k, v in kwargs.items():
-        if type(v)==list:
+        if isinstance(v, list):
             if v[0] is not None:
                 kw[k] = v
         elif v is not None:
@@ -79,11 +79,11 @@ def _check_kwargs_defaults(kwargs, defaults):
 
 
 def _parse_limits(lims):
-    if type(lims)==list:
-        if len(lims)==3:
+    if isinstance(lims, list):
+        if len(lims) == 3:
             val, vmin, vmax = lims
             fixed = False
-        elif len(lims)==2:
+        elif len(lims) == 2:
             val = lims[0]
             vmin = None
             vmax = None
@@ -131,7 +131,7 @@ class Param(object):
 
     @vmin.setter
     def vmin(self, val):
-        assert (val <= self.value)
+        assert val <= self.value
         self._vmin = val
 
     @property
@@ -140,7 +140,7 @@ class Param(object):
 
     @vmax.setter
     def vmax(self, val):
-        assert (val >= self.value)
+        assert val >= self.value
         self._vmax = val
 
     @property
@@ -185,15 +185,15 @@ class ModelComponent(object):
         self.param_dict = init_pars
 
         for k, v in init_pars.items():
-            val, vmin, vmax, fixed  = _parse_limits(v)
+            val, vmin, vmax, fixed = _parse_limits(v)
             p = Param(k, val, vmin, vmax, fixed, **kwargs)
             setattr(self, k, p)
 
         if center:
-            val, vmin, vmax, fixed  = _parse_limits(center[0])
+            val, vmin, vmax, fixed = _parse_limits(center[0])
             self.X0 = Param('X0', val, vmin, vmax, fixed, **kwargs)
 
-            val, vmin, vmax, fixed  = _parse_limits(center[1])
+            val, vmin, vmax, fixed = _parse_limits(center[1])
             self.Y0 = Param('Y0', val, vmin, vmax, fixed, **kwargs)
         else:
             self.X0 = None
