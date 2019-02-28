@@ -9,4 +9,4 @@ def get_img_center(img, ext=1):
         Y0, X0 = img
     else:
         Y0, X0 = img.shape
-    return X0/2, Y0/2    
+    return X0/2, Y0/2
