@@ -55,6 +55,15 @@ DEFAULT_MOFFAT = OrderedDict([
     ('beta', [2.0, 0.1, 5])
 ])
 
+DEFAULT_MODIFIEDKING = OrderedDict([
+    ('PA', [20., 0., 360]),
+    ('ell', [0.2, 0., 0.99]),
+    ('I_0', [1.0, 0.01, 5]),
+    ('r_c', [0.2, 0.01, 10]),
+    ('r_t', [2.0, 0.1, 20]),
+    ('alpha', [2.0, 1.0, 5.0])
+])
+
 DEFAULT_POINTSOURCE = OrderedDict([
     ('I_tot', [1.0, 0.01, 5])
 ])
@@ -65,6 +74,7 @@ GAUSS_PARAMS = ['PA', 'ell', 'I_0', 'sigma']
 EXP_PARAMS = ['PA', 'ell', 'I_0', 'h']
 FLATSKY_PARAMS = ['I_sky']
 MOFFAT_PARAMS = ['PA', 'ell', 'I_0', 'fwhm', 'beta']
+MODIFIEDKING_PARAMS = ['PA', 'ell', 'I_0', 'r_c', 'r_t', 'alpha'] 
 POINTSOURCE_PARAMS = ['I_tot']
 
 
@@ -74,6 +84,7 @@ default_params = dict(Sersic=DEFAULT_SERSIC,
                       FlatSky=DEFAULT_FLATSKY,
                       Exponential=DEFAULT_EXP,
                       Moffat=DEFAULT_MOFFAT,
+                      ModifiedKing=DEFAULT_MODIFIEDKING,
                       PointSource=DEFAULT_POINTSOURCE)
 
 param_names = {
@@ -83,6 +94,7 @@ param_names = {
     'FlatSky': FLATSKY_PARAMS,
     'Exponential': EXP_PARAMS,
     'Moffat': MOFFAT_PARAMS,
+    'ModifiedKing': MODIFIEDKING_PARAMS,
     'PointSource': POINTSOURCE_PARAMS
 }
 
