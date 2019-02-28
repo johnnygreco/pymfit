@@ -231,11 +231,11 @@ class Model(object):
 
     def __init__(self, funcs, params, centers, dcent=30, **kwargs):
 
-        if type(centers[0]) != list:
+        if not isinstance(centers[0], list):
             centers = [centers]
-        if type(funcs) != list:
+        if not isinstance(funcs, list):
             funcs = [funcs]
-        if type(params) != list:
+        if not isinstance(params, list):
             params = [params]
 
         self.funcs = funcs
