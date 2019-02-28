@@ -46,6 +46,14 @@ DEFAULT_BROKENEXP = OrderedDict([
     ('alpha', [1., 0.5, 5.])
 ])
 
+DEFAULT_EDGEDISK = OrderedDict([
+    ('PA', [20., 0., 360]),
+    ('L_0', [0.05, 0., 1000]),
+    ('h', [20., 0., 5000]),
+    ('n', [2., 1., 100]),
+    ('z_0', [2., 1., 100]),
+])
+
 DEFAULT_GAUSS = OrderedDict([
     ('PA', [20., 0., 360]),
     ('ell', [0.2, 0., 0.99]),
@@ -92,6 +100,7 @@ GAUSS_PARAMS = ['PA', 'ell', 'I_0', 'sigma']
 RING_PARAMS = ['PA', 'ell', 'A', 'R_ring', 'sigma_r']
 EXP_PARAMS = ['PA', 'ell', 'I_0', 'h']
 BROKENEXP_PARAMS = ['PA', 'ell', 'I_0', 'h1', 'h2', 'r_break', 'alpha']
+EDGEDISK_PARAMS = ['PA', 'L_0', 'h', 'n', 'z_0']
 FLATSKY_PARAMS = ['I_sky']
 MOFFAT_PARAMS = ['PA', 'ell', 'I_0', 'fwhm', 'beta']
 MODIFIEDKING_PARAMS = ['PA', 'ell', 'I_0', 'r_c', 'r_t', 'alpha'] 
@@ -105,6 +114,7 @@ default_params = dict(Sersic=DEFAULT_SERSIC,
                       FlatSky=DEFAULT_FLATSKY,
                       Exponential=DEFAULT_EXP,
                       BrokenExponential=DEFAULT_BROKENEXP,
+                      EdgeOnDisk=DEFAULT_EDGEDISK,
                       Moffat=DEFAULT_MOFFAT,
                       ModifiedKing=DEFAULT_MODIFIEDKING,
                       PointSource=DEFAULT_POINTSOURCE)
@@ -116,6 +126,7 @@ param_names = {
     'GaussianRing': RING_PARAMS,
     'FlatSky': FLATSKY_PARAMS,
     'Exponential': EXP_PARAMS,
+    'EdgeOnDisk': EDGEDISK_PARAMS,
     'BrokenExponential': BROKENEXP_PARAMS,
     'Moffat': MOFFAT_PARAMS,
     'ModifiedKing': MODIFIEDKING_PARAMS,
