@@ -53,6 +53,14 @@ DEFAULT_GAUSS = OrderedDict([
     ('sigma', [0.1, 0.01, 1])
 ])
 
+DEFAULT_RING = OrderedDict([
+    ('PA', [20., 0., 360]),
+    ('ell', [0.2, 0., 0.99]),
+    ('A', [1.0, 0.01, 5]),
+    ('R_ring', [2.0, 0.1, 10]),
+    ('sigma_r', [1.0, 0.2, 5.0])
+])
+
 DEFAULT_FLATSKY = OrderedDict([
     ('I_sky', [0., -5, 5])
 ])
@@ -81,6 +89,7 @@ DEFAULT_POINTSOURCE = OrderedDict([
 SERSIC_PARAMS = ['PA', 'ell', 'n', 'I_e', 'r_e']
 SERSIC_GENELLIPSE_PARAMS = ['PA', 'ell', 'c0', 'n', 'I_e', 'r_e']
 GAUSS_PARAMS = ['PA', 'ell', 'I_0', 'sigma']
+RING_PARAMS = ['PA', 'ell', 'A', 'R_ring', 'sigma_r']
 EXP_PARAMS = ['PA', 'ell', 'I_0', 'h']
 BROKENEXP_PARAMS = ['PA', 'ell', 'I_0', 'h1', 'h2', 'r_break', 'alpha']
 FLATSKY_PARAMS = ['I_sky']
@@ -92,6 +101,7 @@ POINTSOURCE_PARAMS = ['I_tot']
 default_params = dict(Sersic=DEFAULT_SERSIC,
                       Sersic_GenEllipse=DEFAULT_SERSIC_GENELLIPSE,
                       Gaussian=DEFAULT_GAUSS,
+                      GaussianRing=DEFAULT_RING,
                       FlatSky=DEFAULT_FLATSKY,
                       Exponential=DEFAULT_EXP,
                       BrokenExponential=DEFAULT_BROKENEXP,
@@ -103,6 +113,7 @@ param_names = {
     'Sersic': SERSIC_PARAMS,
     'Sersic_GenEllipse': SERSIC_GENELLIPSE_PARAMS,
     'Gaussian': GAUSS_PARAMS,
+    'GaussianRing': RING_PARAMS,
     'FlatSky': FLATSKY_PARAMS,
     'Exponential': EXP_PARAMS,
     'BrokenExponential': BROKENEXP_PARAMS,
