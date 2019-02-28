@@ -36,6 +36,16 @@ DEFAULT_EXP = OrderedDict([
     ('h', [20., 0., 5000])
 ])
 
+DEFAULT_BROKENEXP = OrderedDict([
+    ('PA', [20., 0., 360]),
+    ('ell', [0.2, 0., 0.99]),
+    ('I_0', [0.05, 0., 1000]),
+    ('h1', [4., 0., 5000]),
+    ('h2', [8., 0., 5000]),
+    ('r_break', [20., 0., 5000]),
+    ('alpha', [1., 0.5, 5.])
+])
+
 DEFAULT_GAUSS = OrderedDict([
     ('PA', [20., 0., 360]),
     ('ell', [0.2, 0., 0.99]),
@@ -72,6 +82,7 @@ SERSIC_PARAMS = ['PA', 'ell', 'n', 'I_e', 'r_e']
 SERSIC_GENELLIPSE_PARAMS = ['PA', 'ell', 'c0', 'n', 'I_e', 'r_e']
 GAUSS_PARAMS = ['PA', 'ell', 'I_0', 'sigma']
 EXP_PARAMS = ['PA', 'ell', 'I_0', 'h']
+BROKENEXP_PARAMS = ['PA', 'ell', 'I_0', 'h1', 'h2', 'r_break', 'alpha']
 FLATSKY_PARAMS = ['I_sky']
 MOFFAT_PARAMS = ['PA', 'ell', 'I_0', 'fwhm', 'beta']
 MODIFIEDKING_PARAMS = ['PA', 'ell', 'I_0', 'r_c', 'r_t', 'alpha'] 
@@ -83,6 +94,7 @@ default_params = dict(Sersic=DEFAULT_SERSIC,
                       Gaussian=DEFAULT_GAUSS,
                       FlatSky=DEFAULT_FLATSKY,
                       Exponential=DEFAULT_EXP,
+                      BrokenExponential=DEFAULT_BROKENEXP,
                       Moffat=DEFAULT_MOFFAT,
                       ModifiedKing=DEFAULT_MODIFIEDKING,
                       PointSource=DEFAULT_POINTSOURCE)
@@ -93,6 +105,7 @@ param_names = {
     'Gaussian': GAUSS_PARAMS,
     'FlatSky': FLATSKY_PARAMS,
     'Exponential': EXP_PARAMS,
+    'BrokenExponential': BROKENEXP_PARAMS,
     'Moffat': MOFFAT_PARAMS,
     'ModifiedKing': MODIFIEDKING_PARAMS,
     'PointSource': POINTSOURCE_PARAMS
