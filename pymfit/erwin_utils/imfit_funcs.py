@@ -81,7 +81,7 @@ def Moffat( r, params, mag=True, magOutput=True ):
 		params[3] = beta
 	If mag=True, then the second parameter value is mu_0, not I_0, and
 	the value will be calculated in magnitudes, not intensities.
-	
+
 	To have input mu_0 in magnitudes but *output* in intensity, set mag=True
 	and magOutput=False.
 	"""
@@ -114,11 +114,11 @@ def Sersic( r, params, mag=True, magOutput=True ):
 		params[3] = r_e
 	If mag=True, then the second parameter value is mu_e, not I_e, and
 	the value will be calculated in magnitudes, not intensities.
-	
+
 	To have input I_e in magnitudes but *output* in intensity, set mag=True
 	and magOutput=False.
 	"""
-	
+
 	r0 = params[0]
 	R = np.abs(r - r0)
 	n = params[1]
@@ -143,11 +143,11 @@ def Exponential( r, params, mag=True, magOutput=True ):
 		params[2] = h
 	If mag=True, then the first parameter value is mu_0, not I_0, and
 	the value will be calculated in magnitudes, not intensities.
-	
+
 	To have input I_0 in magnitudes but *output* in intensity, set mag=True
 	and magOutput=False.
 	"""
-	
+
 	r0 = params[0]
 	R = np.abs(r - r0)
 	if mag is True:
@@ -174,15 +174,15 @@ def BrokenExp( r, params, mag=True, magOutput=True ):
 		params[5] = alpha
 	If mag=True, then the first parameter value is mu_0, not I_0, and
 	the value will be calculated in magnitudes, not intensities.
-	
+
 	To have input I_0 in magnitudes but *output* in intensity, set mag=True
 	and magOutput=False.
-	
+
 	FIXME: Need to handle case of alpha = 0
 	FIXME: Need to handle "if ( alpha*(r - Rb) > 100.0)" in case of numpy
 	array instead of scalar value of r.
 	"""
-	
+
 	r0 = params[0]
 	R = np.abs(r - r0)
 	if mag is True:
@@ -194,10 +194,10 @@ def BrokenExp( r, params, mag=True, magOutput=True ):
 	h2 = params[3]
 	Rb = params[4]
 	alpha = params[5]
-	
+
 	exponent = (1.0/alpha) * (1.0/h1 - 1.0/h2)
 	S = (1.0 + np.exp(-alpha*Rb))**(-exponent)
-	
+
 	# check for possible overflow in exponentiatino if r >> Rb
 	if type(R) is np.ndarray:
 		# OK, we're dealing with a numpy array
@@ -214,7 +214,7 @@ def BrokenExp( r, params, mag=True, magOutput=True ):
 			goodInd = [ i for i in range(len(R)) if scaledR[i] < 100.0 ]
 			crossoverInd = goodInd[-1]
 			I = np.zeros(len(r))
-			I[0:crossoverInd] = I_0 * S * np.exp(-R[0:crossoverInd]/h1) * (1.0 + 
+			I[0:crossoverInd] = I_0 * S * np.exp(-R[0:crossoverInd]/h1) * (1.0 +
 								np.exp(alpha*(R[0:crossoverInd] - Rb)))**exponent
 			I[crossoverInd:] = I_0 * S * np.exp(Rb/h2 - Rb/h1 - R[crossoverInd:]/h2)
 	elif ( alpha*(R - Rb) > 100.0):
@@ -225,7 +225,7 @@ def BrokenExp( r, params, mag=True, magOutput=True ):
 		# scalar value of r, with r < crossover point
 		# fully correct calculation:
 		I = I_0 * S * np.exp(-R/h1) * (1.0 + np.exp(alpha*(R - Rb)))**exponent
-		
+
 	if (mag is True) and (magOutput is True):
 		return -2.5 * np.log10(I)
 	else:
@@ -240,11 +240,11 @@ def Sech( r, params, mag=True, magOutput=True ):
 		params[2] = h
 	If mag=True, then the first parameter value is mu_0, not I_0, and
 	the value will be calculated in magnitudes, not intensities.
-	
+
 	To have input I_0 in magnitudes but *output* in intensity, set mag=True
 	and magOutput=False.
 	"""
-	
+
 	r0 = params[0]
 	R = np.abs(r - r0)
 	if mag is True:
@@ -269,11 +269,11 @@ def Sech2( r, params, mag=True, magOutput=True ):
 		params[2] = h
 	If mag=True, then the first parameter value is mu_0, not I_0, and
 	the value will be calculated in magnitudes, not intensities.
-	
+
 	To have input I_0 in magnitudes but *output* in intensity, set mag=True
 	and magOutput=False.
 	"""
-	
+
 	r0 = params[0]
 	R = np.abs(r - r0)
 	if mag is True:
@@ -301,11 +301,11 @@ def vdKSech( r, params, mag=True, magOutput=True ):
 		params[3] = alpha   [= n/2 in van der Kruit's formulation]
 	If mag=True, then the first parameter value is mu_0, not I_0, and
 	the value will be calculated in magnitudes, not intensities.
-	
+
 	To have input I_0 in magnitudes but *output* in intensity, set mag=True
 	and magOutput=False.
 	"""
-	
+
 	r0 = params[0]
 	R = np.abs(r - r0)
 	if mag is True:
@@ -334,7 +334,7 @@ def Gauss( x, params, mag=True, magOutput=True ):
 		params[1] = A_gauss_mag [= magnitudes/sq.arcsec if mag=True]
 		params[2] = sigma
 	"""
-	
+
 	x0 = params[0]
 	if mag is True:
 		A_gauss_mag = params[1]
@@ -360,10 +360,10 @@ def GaussRing( x, params, mag=True, magOutput=True ):
 		params[1] = A_gauss_mag [= magnitudes/sq.arcsec if mag=True]
 		params[2] = x-value of Gaussian center (i.e., ring radius)
 		params[3] = sigma
-		
+
 	This is the Gaussian for a *ring* with ring (major-axis) radius = params[2]
 	"""
-	
+
 	x0 = params[2]
 	if mag is True:
 		A_gauss_mag = params[1]
@@ -390,7 +390,7 @@ def Gauss2Side( x, params, mag=True, magOutput=True ):
 		params[2] = sigma_left
 		params[3] = sigma_right
 	"""
-	
+
 	x0 = params[0]
 	if mag:
 		A_gauss_mag = params[1]
@@ -434,11 +434,11 @@ def GaussRing2Side( x, params, mag=True, magOutput=True ):
 		params[2] = x-value of Gaussian center (i.e., ring radius)
 		params[3] = sigma_left
 		params[4] = sigma_right
-	
+
 	This is the 2-sided Gaussian for a *ring* with ring (major-axis) radius =
 	params[2]
 	"""
-	
+
 	x0 = params[2]
 	if mag:
 		A_gauss_mag = params[1]
@@ -483,10 +483,10 @@ def ExpMag( x, params ):
 		params[0] = mu_0
 		params[1] = h
 	"""
-	
+
 	mu_0 = params[0]
 	h = params[1]
-	
+
 	return mu_0 + 1.085736*(x/h)
 
 
@@ -500,10 +500,10 @@ def vdKBessel( r, mu00, h ):
 	else:
 #		return mu00 * (r/h) * mpmath.besselk(1, r/h)
 		return mu00 * (r/h) * BesselK(1, r/h)
-		
-	
+
+
 def EdgeOnDisk(rr, p):
-	
+
 	L_0 = p[0]
 	h = p[1]
 	mu00 = 2*h*L_0

@@ -15,16 +15,16 @@ class MultiComponentModel ( object ):
     """
     Container class to hold the information needed to execute and reconstruct a fit
     with multiple objects and components.
-    
+
     """
     def __init__ ( self ):
         self.config_tree = {}
         self.nobjects = 0
         self.fit = False
-        
+
     def add_object ( self, gal_pos='center', img_shape=None, delta_pos=50.):
         '''
-        Add object (i.e. position) to the fit. 
+        Add object (i.e. position) to the fit.
         '''
         if gal_pos == 'center':
             assert img_shape is not None, 'must give shape!'
@@ -36,10 +36,10 @@ class MultiComponentModel ( object ):
         x0 = [gal_pos[0], gal_pos[0]-delta_pos, gal_pos[0]+delta_pos]
         y0 = [gal_pos[1], gal_pos[1]-delta_pos, gal_pos[1]+delta_pos]
         mc = ModelContainer ( self.nobjects, [x0,y0] )
-        
+
         self.config_tree [ self.nobjects ] = mc
         self.nobjects += 1
-        
+
     def add_component ( self, objnumber, funcname, init_params={}):
         '''
         Add a component to an extant object
@@ -50,16 +50,16 @@ class MultiComponentModel ( object ):
             Object ID number (as assigned during MultiComponentModel.add_object)
         funcname : string
             Name of the functional form, as defined by imfit
-        init_params : dict 
+        init_params : dict
             Non-default initial parameters for the component
         '''
-        
+
         if funcname not in AVAILABLE_FUNCS:
             raise NotImplementedError ( '{0} not implemented in pymfit.'.format(funcname) )
 
         imfit_config = copy.deepcopy ( globals()['DEFAULT_{0}'.format(funcname.upper())] )
         for k,v in init_params.items():
-            imfit_config[k] = v  
+            imfit_config[k] = v
 
         assert objnumber < self.nobjects, "No object #{0} in model.".format(objnumber)
         self.config_tree [ objnumber ].add_component ( funcname, imfit_config )
@@ -82,7 +82,7 @@ class MultiComponentResults ( MultiComponentModel ):
 
     def add_parameter ( self, objnumber, component_number, name, param, param_err ):
         self.config_tree[objnumber].add_parameter ( name, param, param_err, component_number )
-        
+
     @property
     def reduced_chisq ( self ):
         assert self._reduced_chisq is not None, "No reduced chi^2 recorded!"
@@ -91,7 +91,7 @@ class MultiComponentResults ( MultiComponentModel ):
     @reduced_chisq.setter
     def reduced_chisq ( self, value ):
         self._reduced_chisq = value
-        
+
     def array ( self, shape, logscale=False ):
         '''
         Get 2D array of multicomponent model
@@ -107,7 +107,7 @@ class MultiComponentResults ( MultiComponentModel ):
                 ovlmodel += model.array ( shape )
 
         return ovlmodel
-            
+
 class ModelContainer ( object ):
     """
     Container class to hold information about an individual object in the model.
@@ -145,8 +145,8 @@ class ResultContainer ( object ):
         self.component_nests = {}
 
     def __len__ ( self ):
-        return self.ncomponents 
-    
+        return self.ncomponents
+
     def __getitem__ ( self, key ):
         return self.component_nests[key]
 

@@ -11,7 +11,7 @@ from astropy.convolution import Gaussian2DKernel
 from astropy import __version__ as astropy_ver
 import sep
 
-try: 
+try:
     import lsst.afw.image as afwImage
     import lsst.afw.detection as afwDetect
     LSST_IMPORTED = True
@@ -19,8 +19,8 @@ except ImportError:
     LSST_IMPORTED = False
 
 
-__all__ = ['get_hsc_pipe_mask', 'meas_back', 
-           'detect_sources', 'make_seg_mask', 
+__all__ = ['get_hsc_pipe_mask', 'meas_back',
+           'detect_sources', 'make_seg_mask',
            'make_obj_mask', 'make_mask']
 
 
@@ -36,8 +36,8 @@ def _byteswap(arr):
 
 def _outside_circle(cat, xc, yc, r):
     """
-    Returns a mask of all objectes that fall outside a 
-    circle centered at (xc, yc) of radius r. 
+    Returns a mask of all objectes that fall outside a
+    circle centered at (xc, yc) of radius r.
     """
     return np.sqrt((cat['x']-xc)**2 + (cat['y']-yc)**2) > r
 
@@ -58,7 +58,7 @@ def get_hsc_pipe_mask(mask, gal_pos):
     -------
     photo_mask : ndarray
         Photometry mask, where masked pixels = 1 and
-        all other pixels = 0. 
+        all other pixels = 0.
     """
     assert LSST_IMPORTED, 'LSST stack not found.'
 
@@ -86,7 +86,7 @@ def get_hsc_pipe_mask(mask, gal_pos):
 
 def make_seg_mask(seg, grow_sig=6.0, mask_thresh=0.01, mask_max=1000.0):
     """
-    Make mask from segmentation image. The mask is convolved with 
+    Make mask from segmentation image. The mask is convolved with
     a Gaussian to "grow the mask".
 
     Parameters
@@ -94,12 +94,12 @@ def make_seg_mask(seg, grow_sig=6.0, mask_thresh=0.01, mask_max=1000.0):
     seg : 2D ndarray
         Segmentation map from SEP.
     grow_sig : float, optional
-        Sigma of Gaussian kernel in pixels. 
+        Sigma of Gaussian kernel in pixels.
     mask_thresh : float, optional
         All pixels above this value will be masked.
     mask_max : float, optional
-        All pixels >0 will be set to this value 
-        prior to the convolution. 
+        All pixels >0 will be set to this value
+        prior to the convolution.
 
     Returns
     -------
@@ -124,7 +124,7 @@ def make_obj_mask(cat, img_shape, grow_r=1.0):
     img_shape : array-like
         The shape of the image to be masked.
     grow_r : float, optional
-        Fraction to grow the objects sizes.  
+        Fraction to grow the objects sizes.
 
     Returns
     -------
@@ -148,18 +148,18 @@ def meas_back(img, backsize, backffrac=0.5, mask=None, sub_from_img=True):
     backsize : int
         Size of background boxes in pixels.
     backffrac : float, optional
-        The fraction of background box size for the 
+        The fraction of background box size for the
         filter size for smoothing the background.
     mask : ndarray, optional
         Mask array for pixels to exclude from background
-        estimation. 
+        estimation.
     sub_from_img : bool, optional
         If True, also return background subtracted image.
 
     Returns
     -------
-    bkg : sep.Background object 
-       See SEP documentation for methods & attributes. 
+    bkg : sep.Background object
+       See SEP documentation for methods & attributes.
     img_bsub : ndarray, if sub_from_img is True
     """
     img = _byteswap(img)
@@ -174,30 +174,30 @@ def meas_back(img, backsize, backffrac=0.5, mask=None, sub_from_img=True):
         return bkg
 
 
-def detect_sources(img, thresh, backsize, backffrac=0.5, 
+def detect_sources(img, thresh, backsize, backffrac=0.5,
                    mask=None, return_all=False, kern_sig=5.0, **kwargs):
     """
-    Detect sources to construct a mask for photometry. 
+    Detect sources to construct a mask for photometry.
 
     Parameters
     ----------
     img : 2D ndarray
         Image to be masked.
     thresh : float
-        Detection threshold with respect to background 
-        for source extraction. 
+        Detection threshold with respect to background
+        for source extraction.
     backsize : int
         Size of background boxes in pixels.
     backffrac : float, optional
-        The fraction of background box size for the 
+        The fraction of background box size for the
         filter size for smoothing the background.
     mask : ndarray, optional
         Mask to apply before background estimation.
         Must have same shape as img.
     return_all : bool, optional
-        If True, return the catalog objects, seg map, 
+        If True, return the catalog objects, seg map,
         background image, and the background subtracted
-        image. 
+        image.
     kern_sig : float, optional
         Sigma of smoothing Gaussian in pixels.
     kwargs : dict, optional
@@ -209,10 +209,10 @@ def detect_sources(img, thresh, backsize, backffrac=0.5,
     obj : astropy.table.Table
         Source catalog from SEP.
     seg : 2D ndarray
-        Segmentation map from the source extraction. 
+        Segmentation map from the source extraction.
         Same shape as input image.
     bck : 2D ndarray, if return_all=True
-        Background image measured by SEP. 
+        Background image measured by SEP.
     img : 2D ndarray, if return_all=True
         Background subtracted image.
     """
@@ -231,12 +231,12 @@ def detect_sources(img, thresh, backsize, backffrac=0.5,
 
 
 def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
-              out_fn=None, gal_pos='center', seg_rmin=100.0, obj_rmin=15.0, 
-              grow_sig=6.0, mask_thresh=0.02, grow_obj=3.0, kern_sig=4.0, 
+              out_fn=None, gal_pos='center', seg_rmin=100.0, obj_rmin=15.0,
+              grow_sig=6.0, mask_thresh=0.02, grow_obj=3.0, kern_sig=4.0,
               use_hsc_mask=False, sep_extract_kws={}):
     """
     Generate a mask for galaxy photometry using SEP. Many of these
-    parameters are those of SEP, so see its documentation for 
+    parameters are those of SEP, so see its documentation for
     more info.
 
     Parameters
@@ -244,43 +244,43 @@ def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
     image : str, ndarray, or lsst.afw.image.MaskedImageF
         Image file name, Image array, masked image object from hscPipe.
     thresh : float, optional
-        Detection threshold for source extraction.  
+        Detection threshold for source extraction.
     backsize : int
         Size of box for background estimation.
     backffrac : float, optional
         Fraction of backsize to make the background median filter.
     gal_pos : array-like, optional
-        (x,y) position of galaxy in pixels. If 'center', the 
+        (x,y) position of galaxy in pixels. If 'center', the
         center of the image is assumed.
     seg_rmin : float, optional
-        Minimum radius with respect to gal_pos for the 
-        segmentation mask. 
+        Minimum radius with respect to gal_pos for the
+        segmentation mask.
     obj_rmin : float, optional
-        Minimum radius with respect to gal_pos for the 
-        object mask. 
+        Minimum radius with respect to gal_pos for the
+        object mask.
     grow_sig : float, optional
         Sigma of the Gaussian that the segmentation mask
-        is convolved with to 'grow' the mask. 
+        is convolved with to 'grow' the mask.
     mask_thresh : float, optional
-        All pixels above this threshold will be masked 
-        in the seg mask. 
+        All pixels above this threshold will be masked
+        in the seg mask.
     grow_obj : float, optional
-        Fraction to grow the objects of the obj mask. 
+        Fraction to grow the objects of the obj mask.
     out_fn : string, optional
-        If not None, save the mask with this file name. 
+        If not None, save the mask with this file name.
     kern_sig: float, optional
         Sigma (in pixels) of Gaussian for pre-source detection smoothing.
     use_hsc_mask: bool, optional
         If True, use HSC pipeline mask to mask sources (in addition to
-        the mask generated by sep). 
+        the mask generated by sep).
     sep_extract_kws: dict, optional
         Keywords from sep.extract.
-        
+
     Returns
     -------
     final_mask : 2D ndarray
         Final mask to apply to img, where 0 represents good pixels
-        and 1 masked pixels. The final mask is a combination of 
+        and 1 masked pixels. The final mask is a combination of
         a segmentation, object, and  HSC's detection footprints.
     """
 
@@ -311,7 +311,7 @@ def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
         hsc_bad_mask = get_hsc_pipe_mask(image.getMask(), gal_pos)
     else:
         hsc_bad_mask = np.zeros_like(img, dtype=bool)
-    
+
     #################################################################
     # Detect sources in image to mask before we do photometry.
     #################################################################
@@ -321,11 +321,11 @@ def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
         None, True, kern_sig, **sep_extract_kws)
 
     #################################################################
-    # Exclude objects inside seg_rmin and obj_rmin. Note that the 
+    # Exclude objects inside seg_rmin and obj_rmin. Note that the
     # segmentation label of the object at index i is i+1.
     #################################################################
 
-    exclude_labels = np.where(~_outside_circle(obj, gal_x, gal_y, seg_rmin))[0] 
+    exclude_labels = np.where(~_outside_circle(obj, gal_x, gal_y, seg_rmin))[0]
     exclude_labels += 1
     for label in exclude_labels:
         seg[seg==label] = 0
@@ -334,10 +334,10 @@ def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
     obj = obj[keepers]
 
     #################################################################
-    # Generate segmentation and object masks. Combine with HSC 
+    # Generate segmentation and object masks. Combine with HSC
     # detection footprints.
     #################################################################
-    
+
     seg_mask = make_seg_mask(seg, grow_sig, mask_thresh)
     obj_mask = make_obj_mask(obj, img.shape, grow_obj)
     final_mask = (seg_mask | obj_mask | hsc_bad_mask).astype(int)
