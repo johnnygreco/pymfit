@@ -14,12 +14,15 @@ zscale = ZScaleInterval()
 
 __all__ = ['img_mod_res']
 
+
 def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r, 
-                save_fn=None, show=True, band='', subplots=None, 
-                titles=True, pixscale=0.168, psf_fn=None, **kwargs):
+                save_fn=None, show=True, band=None, subplots=None, 
+                titles=True, pixscale=0.168, psf_fn=None, zpt=27., 
+                fontsize=20, **kwargs):
     """
     Show imfit results: image, model, and residual.
     """
+
 
     img = fits.getdata(img_fn)
 
@@ -30,7 +33,7 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
     else:
         fig, axes = subplots
 
-    s = Sersic(mod_params)
+    s = Sersic(mod_params, pixscale=pixscale, zpt=zpt)
     model = s.array(img.shape)
 
     if psf_fn is not None:
@@ -53,7 +56,7 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
     for i, data in enumerate([img, model, res]):
         axes[i].imshow(data, vmin=vmin, vmax=vmax, origin='lower', 
                        cmap=cmap, aspect='equal', rasterized=True)
-        axes[i].set_title(titles[i], fontsize=20, y=1.01)
+        axes[i].set_title(titles[i], fontsize=fontsize + 4, y=1.01)
 
     if mask_fn is not None:
         mask = fits.getdata(mask_fn)
@@ -64,10 +67,13 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
 
     x = 0.05
     y = 0.93
-    dy = 0.08
-    dx = 0.63
-    fs = 17
-    m_tot = r'$m_'+band+'='+str(round(s.m_tot, 1))+'$'
+    dy = 0.09
+    dx = 0.61
+    fs = fontsize
+    if band is not None:
+        m_tot = r'$m_'+band+' = '+str(round(s.m_tot, 1))+'$'
+    else:
+        m_tot = r'$m = '+str(round(s.m_tot, 1))+'$'
     r_e = r'$r_\mathrm{eff}='+str(round(s.r_e*pixscale,1))+'^{\prime\prime}$'
     mu_0 = r'$\mu_0='+str(round(s.mu_0,1))+'$'
     mu_e = r'$\mu_e='+str(round(s.mu_e,1))+'$'
@@ -85,8 +91,9 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
                  fontsize=fs, color=c)
     axes[1].text(x+dx, y-dy, r_e, transform=axes[1].transAxes, 
                  fontsize=fs, color=c)
-    axes[1].text(0.9, 0.05, band, color='r', transform=axes[1].transAxes,
-                 fontsize=25)
+    if band is not None:
+        axes[1].text(0.9, 0.05, band, color='r', transform=axes[1].transAxes,
+                     fontsize=25)
     if 'reduced_chisq' in list(mod_params.keys()):
         chisq = r'$\chi^2_\mathrm{dof} = '+\
                 str(round(mod_params['reduced_chisq'],2))+'$' 

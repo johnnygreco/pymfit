@@ -21,7 +21,8 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
         save_model=False, save_res=False, out_fn='bestfit_imfit_params.dat', 
         config=None, psf_fn=None, poisson_mlr=False, quiet=False, 
         cashstat=False, mcmc=False, mcmc_prefix='mcmc_out', bootstrap=0, 
-        bootstrap_fn=None, mcmc_kws={}, options='', pymfitter=False):
+        bootstrap_fn=None, mcmc_kws={}, options='', pymfitter=False, 
+        weights=False):
     """
     Run imfit.
 
@@ -74,6 +75,9 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
         e.g., '--max-threads 5 --seed 341 --quiet'
     pymfitter: bool, optional
         If True, run is being called from a PymFitter instance.
+    weights: bool, optional
+        If True, treat the noise image as wieght map; otherwise 
+        treat it as variance image
 
     Returns
     -------
@@ -90,10 +94,12 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
     if mask_fn is not None:
         cmd += "--mask '"+mask_fn+"' "
     if var_fn is not None:
-        if not sigma:
-            cmd += "--noise '"+var_fn+"' --errors-are-variances "
-        else:
+        if sigma:
             cmd += "--noise '"+var_fn+"'  "
+        elif weights:
+            cmd += "--noise '"+var_fn+"' --errors-are-weights "
+        else:
+            cmd += "--noise '"+var_fn+"' --errors-are-variances "
     if psf_fn is not None:
         cmd += "--psf '"+psf_fn+"' "
 
