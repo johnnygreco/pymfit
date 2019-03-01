@@ -5,7 +5,7 @@ from astropy.io import fits
 __all__ = ['DEFAULT_SERSIC', 'sersic_config']
 
 DEFAULT_SERSIC = {'X0': None ,
-                  'Y0': None,  
+                  'Y0': None,
                   'PA': [20., 0, 360],
                   'ell': [0.2, 0, 0.99],
                   'n': [1.0, 0.01, 5],
@@ -19,15 +19,15 @@ def sersic_config(init_params={}, gal_pos='center', img_shape=None, delta_pos=50
     Parameters
     ----------
     init_params: dict, optional
-        Initial parameters that are different from DEFAULT_SERSIC. 
+        Initial parameters that are different from DEFAULT_SERSIC.
         See pymfit.write_config doc string for syntax.
     gal_pos: tuple, optional
         (X0, Y0) position of galaxy. If 'center', will use center of image.
         In this case, must give image shape of file name.
     img_shape: tuple or str, optional
-        Image shape or the image file name. 
+        Image shape or the image file name.
     delta_pos: float, optional
-        The +/- limits for the position. 
+        The +/- limits for the position.
     """
 
     imfit_config = DEFAULT_SERSIC.copy()

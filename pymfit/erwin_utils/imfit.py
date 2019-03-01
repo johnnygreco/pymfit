@@ -1,6 +1,6 @@
 """
 Python helper functions for imfit written by Peter Erwin.
-Modified by Johnny Greco to be compatible with python 3. 
+Modified by Johnny Greco to be compatible with python 3.
 """
 from __future__ import division, print_function
 
@@ -15,13 +15,13 @@ from . import imfit_funcs as imfuncs
 # dictionary mapping imfit function short names (as found in the config/parameter file) to
 # corresponding 1-D Python functions in imfit_funcs.py, along with some useful information:
 #    "function" = corresponding imfit_funcs.py function, if one exists
-#    "nSkip" = the number of 2D-related  parameters to skip (e.g., PA, ellipticity), 
-#    "ell" = index for ellipticity parameter, if it exists, 
+#    "nSkip" = the number of 2D-related  parameters to skip (e.g., PA, ellipticity),
+#    "ell" = index for ellipticity parameter, if it exists,
 #    "a" = index or indices for semi-major-axis parameters (r_e, h, sigma, etc.)
-imfitFunctionMap = {"Exponential": {"function": imfuncs.Exponential, "nSkip": 2, "ell": 1, "a": [3]}, 
+imfitFunctionMap = {"Exponential": {"function": imfuncs.Exponential, "nSkip": 2, "ell": 1, "a": [3]},
 				"Exponential_GenEllipse": {"function": imfuncs.Exponential, "nSkip": 3, "ell": 1, "a": [4]},
 				"Sersic":  {"function": imfuncs.Sersic, "nSkip": 2, "ell": 1, "a": [4]},
-				"Sersic_GenEllipse":  {"function": imfuncs.Sersic, "nSkip": 3, "ell": 1, "a": [5]}, 
+				"Sersic_GenEllipse":  {"function": imfuncs.Sersic, "nSkip": 3, "ell": 1, "a": [5]},
 				"Gaussian":  {"function": imfuncs.Gauss, "nSkip": 2, "ell": 1, "a": [3]},
 				"GaussianRing":  {"function": imfuncs.GaussRing, "nSkip": 2, "ell": 1, "a": [3,4]},
 				"GaussianRing2Side":  {"function": imfuncs.GaussRing2Side, "nSkip": 2, "ell": 1, "a": [3,4,5]},
@@ -38,7 +38,7 @@ def GetFunctionImageNames( baseName, funcNameList ):
 	"""Generate a list of FITS filenames as would be created by makeimage in "--output-functions"
 	mode.
 	"""
-	
+
 	nImages = len(funcNameList)
 	imageNameList = [ "%s%d_%s.fits" % (baseName, i + 1, funcNameList[i]) for i in range(nImages) ]
 	return imageNameList
@@ -48,17 +48,17 @@ def ReadImfitConfigFile( fileName, minorAxis=False, pix=0.168, getNames=False, X
 	"""Function to read and parse an imfit-generated parameter file
 	(or input config file) and return a tuple consisting of:
 	(list of 1-D imfit_funcs functions, list of lists of parameters).
-	
+
 	pix = scale in arcsec/pixel, if desired for plotting vs radii in arcsec.
-	
+
 	We assume that all functions have a center at x = 0; this can be changed by setting
 	X0.
-	
+
 	Returns tuple of (functionList, trimmedParameterList)
 	If getNames == True:
 		Returns tuple of (functionNameList, functionList, trimmedParameterList)
 	"""
-	
+
 	dlines = [ line for line in open(fileName) if len(line.strip()) > 0 and line[0] != "#" ]
 
 	funcNameList = []
@@ -89,7 +89,7 @@ def ReadImfitConfigFile( fileName, minorAxis=False, pix=0.168, getNames=False, X
 
 	# ensure that final set of parameters get stored:
 	paramMetaList.append(currentParamList)
-	
+
 	# process function list to remove unneeded parameters (and convert size measures
 	# from major-axis to minor-axis, if requested)
 	funcList = [ imfitFunctionMap[fname]["function"] for fname in funcNameList ]
@@ -119,8 +119,8 @@ def ReadImfitConfigFile( fileName, minorAxis=False, pix=0.168, getNames=False, X
 		trimmedParams = [fullParams[0]]
 		trimmedParams.extend(fullParams[nSkipParams+1:])
 		trimmedParamList.append(trimmedParams)
-		
-	
+
+
 	if getNames is True:
 		return (funcNameList, funcList, trimmedParamList)
 	else:
@@ -139,15 +139,15 @@ def GetBootstrapOutput( filename ):
 	----------
 	filename : str
 		name of file with bootstrap-resampling output
-	
+
 	Returns
 	-------
 	(column_names, data_array) : tuple of (list, np.ndarray)
 		column_names = list of column names (strings)
-		data_array = numpy array of parameter values 
+		data_array = numpy array of parameter values
 			with shape = (n_iterations, n_parameters)
 	"""
-	
+
 	# get first 100 lines
 	# FIXME: file *could* be shorter than 100 lines; really complicated
 	# model could have > 100 lines of header...
@@ -164,34 +164,34 @@ def GetBootstrapOutput( filename ):
 		if columnNames[i] == "likelihood":
 			nParamColumns = i
 			break
-	
+
 	# get the data
 	d = np.loadtxt(filename)
-	
+
 	return (columnNames, d)
 
 
 def GetSingleChain( filename, getAllColumns=False ):
 	"""Reads a single MCMC chain output file and returns a tuple of column names
 	and a numpy array with the data.
-	
+
 	Parameters
 	----------
 	filename : str
 		name of file with MCMC output chain
-	
+
 	getAllColumns: bool, optional
 		if False [default], only model parameter-value columns are retrieved;
 		if True, all output columns (including MCMC diagnostics) are retrieved
-	
+
 	Returns
 	-------
 	(column_names, data_array) : tuple of (list, np.ndarray)
 		column_names = list of column names (strings)
-		data_array = numpy array of parameter values 
+		data_array = numpy array of parameter values
 			with shape = (n_iterations, n_parameters)
 	"""
-	
+
 	# get first 100 lines
 	# FIXME: file *could* be shorter than 100 lines; really complicated
 	# model could have > 100 lines of header...
@@ -208,7 +208,7 @@ def GetSingleChain( filename, getAllColumns=False ):
 		if columnNames[i] == "likelihood":
 			nParamColumns = i
 			break
-	
+
 	# get data for all columns, or just the model parameters?
 	whichCols = None
 	if not getAllColumns:
@@ -217,10 +217,10 @@ def GetSingleChain( filename, getAllColumns=False ):
 	else:
 		whichCols = None
 		outputColumnNames = columnNames
-	
+
 	# get the data
 	d = np.loadtxt(filename, usecols=whichCols)
-	
+
 	return (outputColumnNames, d)
 
 
@@ -230,16 +230,16 @@ def MergeChains( fname_root, maxChains=None, getAllColumns=False, start=10000, l
 	Reads and concatenates all MCMC output chains with filenames = fname_root.*.txt,
 	using data from t=start onwards. By default, all generations from each chain
 	are extracted; this can be modified with the start, last, or secondHalf keywords.
-	
+
 
 	Parameters
 	----------
 	fname_root : str
 		root name of output chain files (e.g., "mcmc_out")
-	
+
 	maxChains : int or None, optional
 		maximum number of chain files to read [default = None = read all files]
-	
+
 	getAllColumns : bool, optional
 		if False [default], only model parameter-value columns are retrieved;
 		if True, all output columns (including MCMC diagnostics) are retrieved
@@ -251,19 +251,19 @@ def MergeChains( fname_root, maxChains=None, getAllColumns=False, start=10000, l
 	last : int or None, optional
 		extract last N samples from each chain
 		ignored if "secondHalf" is True
-	
+
 	secondHalf : bool, optional
 		if True, only the second half of each chain is extracted
-		if False [default], 
-		
+		if False [default],
+
 	Returns
 	-------
 	(column_names, data_array) : tuple of (list, np.ndarray)
 		column_names = list of column names (strings)
-		data_array = numpy array of parameter values 
+		data_array = numpy array of parameter values
 			with shape = (n_samples, n_parameters)
 	"""
-	
+
 	# construct list of filenames
 	if maxChains is None:
 		globPattern = "{0}.*.txt".format(fname_root)
@@ -271,7 +271,7 @@ def MergeChains( fname_root, maxChains=None, getAllColumns=False, start=10000, l
 	else:
 		filenames = ["{0}.{1}.txt".format(fname_root, n) for n in range(maxChains)]
 	nFiles = len(filenames)
-	
+
 	# get the first chain so we can tell how long the chains are
 	(colNames, dd) = GetSingleChain(filenames[0], getAllColumns=getAllColumns)
 	nGenerations = dd.shape[0]
@@ -283,7 +283,7 @@ def MergeChains( fname_root, maxChains=None, getAllColumns=False, start=10000, l
 		startTime = -last
 	else:
 		startTime = start
-	
+
 	# get first chain and column names; figure out if we get all columns or just
 	# model parameters
 	if (startTime >= nGenerations):

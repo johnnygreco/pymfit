@@ -1,8 +1,8 @@
 """
-Collection of visualization functions for imfit. 
+Collection of visualization functions for imfit.
 """
 from __future__ import division, print_function
-                     
+
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -54,7 +54,7 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
 
 
     for i, data in enumerate([img, model, res]):
-        axes[i].imshow(data, vmin=vmin, vmax=vmax, origin='lower', 
+        axes[i].imshow(data, vmin=vmin, vmax=vmax, origin='lower',
                        cmap=cmap, aspect='equal', rasterized=True)
         axes[i].set_title(titles[i], fontsize=fontsize + 4, y=1.01)
 
@@ -62,7 +62,7 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
         mask = fits.getdata(mask_fn)
         mask = mask.astype(float)
         mask[mask==0.0] = np.nan
-        axes[0].imshow(mask, origin='lower', alpha=0.4, 
+        axes[0].imshow(mask, origin='lower', alpha=0.4,
                        vmin=0, vmax=1, cmap='rainbow_r')
 
     x = 0.05
@@ -81,23 +81,23 @@ def img_mod_res(img_fn, mod_params, mask_fn=None, cmap=plt.cm.gray_r,
 
     c = 'b'
 
-    axes[1].text(x, y, m_tot, transform=axes[1].transAxes, 
+    axes[1].text(x, y, m_tot, transform=axes[1].transAxes,
                  fontsize=fs, color=c)
-    axes[1].text(x, y-dy, mu_0, transform=axes[1].transAxes, 
+    axes[1].text(x, y-dy, mu_0, transform=axes[1].transAxes,
                  fontsize=fs, color=c)
-    axes[1].text(x, y-2*dy, mu_e, transform=axes[1].transAxes, 
+    axes[1].text(x, y-2*dy, mu_e, transform=axes[1].transAxes,
                  fontsize=fs, color=c)
-    axes[1].text(x+dx, y, n, transform=axes[1].transAxes, 
+    axes[1].text(x+dx, y, n, transform=axes[1].transAxes,
                  fontsize=fs, color=c)
-    axes[1].text(x+dx, y-dy, r_e, transform=axes[1].transAxes, 
+    axes[1].text(x+dx, y-dy, r_e, transform=axes[1].transAxes,
                  fontsize=fs, color=c)
     if band is not None:
         axes[1].text(0.9, 0.05, band, color='r', transform=axes[1].transAxes,
                      fontsize=25)
     if 'reduced_chisq' in list(mod_params.keys()):
         chisq = r'$\chi^2_\mathrm{dof} = '+\
-                str(round(mod_params['reduced_chisq'],2))+'$' 
-        axes[1].text(x+dx, y-2*dy, chisq, transform=axes[1].transAxes, 
+                str(round(mod_params['reduced_chisq'],2))+'$'
+        axes[1].text(x+dx, y-2*dy, chisq, transform=axes[1].transAxes,
                      fontsize=fs, color=c)
 
     if show:
