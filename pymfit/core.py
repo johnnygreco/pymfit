@@ -88,7 +88,6 @@ def run(img_fn, config_fn, mask_fn=None, var_fn=None, sigma=False,
 
     # main imfit of imfit-mcmc call
     cmd = 'imfit-mcmc ' if mcmc else 'imfit '
-    print(img_fn, config_fn)
     cmd += "'" + img_fn + "' -c " + config_fn + " "
 
     # add mask, variance, and/or psf files if given
