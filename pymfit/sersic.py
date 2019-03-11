@@ -3,6 +3,7 @@ from __future__ import division, print_function
 
 import numpy as np
 from scipy.special import gammaincinv, gamma
+from astropy.convolution import convolve_fft
 from .core import SERSIC_PARAMS
 
 __all__ = ['Sersic']
@@ -71,7 +72,7 @@ class Sersic(object):
         img = self.I_e* np.exp(-self.b_n * (z ** (1/self.n) - 1))
         return img
 
-    def array(self, shape, logscale=False):
+    def array(self, shape, logscale=False, psf=None):
         """
         Get 2D array of Sersic model.
 
@@ -81,6 +82,8 @@ class Sersic(object):
             Shape of output image.
         logscale : bool, optional
             If True, convert image to log scale.
+        psf :  ndarray
+            PSF for convolution with model
 
         Returns
         -------
@@ -89,4 +92,6 @@ class Sersic(object):
         """
         y, x = np.indices(shape)
         img = self.__call__(x, y)
+        if psf is not None:
+            img = convolve_fft(img, psf, normalize_kernel=True)
         return np.log10(img) if logscale else img
