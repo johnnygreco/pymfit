@@ -141,7 +141,7 @@ class PymFitter(object):
                 os.remove(self.res_fn)
 
     def viz_results(self, subplots=None, show=True, save_fn=None,
-                    titles=True, **kwargs):
+                    titles=True, dpi=200, **kwargs):
         from astropy.visualization import ZScaleInterval
         zscale = ZScaleInterval()
 
@@ -182,6 +182,6 @@ class PymFitter(object):
             plt.show()
 
         if save_fn is not None:
-            fig.savefig(save_fn, bbox_inches='tight')
+            fig.savefig(save_fn, bbox_inches='tight', dpi=dpi)
 
         return fig, axes
