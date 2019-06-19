@@ -103,7 +103,7 @@ BROKENEXP_PARAMS = ['PA', 'ell', 'I_0', 'h1', 'h2', 'r_break', 'alpha']
 EDGEDISK_PARAMS = ['PA', 'L_0', 'h', 'n', 'z_0']
 FLATSKY_PARAMS = ['I_sky']
 MOFFAT_PARAMS = ['PA', 'ell', 'I_0', 'fwhm', 'beta']
-MODIFIEDKING_PARAMS = ['PA', 'ell', 'I_0', 'r_c', 'r_t', 'alpha'] 
+MODIFIEDKING_PARAMS = ['PA', 'ell', 'I_0', 'r_c', 'r_t', 'alpha']
 POINTSOURCE_PARAMS = ['I_tot']
 
 
@@ -294,13 +294,13 @@ class Model(object):
                 if (dcent != 'fixed') and (dcent != 0):
                     min_x = center[0]-dcent if center[0]-dcent > 0  else 1
                     min_y = center[1]-dcent if center[1]-dcent > 0  else 1
-                    center[0] = [center[0], min_x, center[0]+dcent]
-                    center[1] = [center[1], min_y, center[1]+dcent]
+                    x_cen = [center[0], min_x, center[0]+dcent]
+                    y_cen = [center[1], min_y, center[1]+dcent]
                 else:
-                    center[0] = [center[0], 'fixed']
-                    center[1] = [center[1], 'fixed']
+                    x_cen = [center[0], 'fixed']
+                    y_cen = [center[1], 'fixed']
             setattr(self, 'comp_'+str(num+1),
-                    ModelComponent(func, pars, center, **kwargs))
+                    ModelComponent(func, pars, [x_cen, y_cen], **kwargs))
 
     def set_comp_param(self, comp_num, param, value, **kwargs):
         getattr(self, 'comp_'+str(comp_num)).set_param(param, value, **kwargs)
