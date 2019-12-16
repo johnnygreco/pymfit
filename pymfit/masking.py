@@ -229,11 +229,23 @@ def detect_sources(img, thresh, backsize, backffrac=0.5,
         img, thresh, segmentation_map=True, filter_kernel=kern, **kwargs)
     return (obj, seg, bkg, img) if return_all else (obj, seg)
 
+def query_overlaps(objs, target):
+    #print("query overlaps")
+    for j in range(objs.size):
+        i = objs[j]
+        buf = np.zeros_like(target, dtype='uint8')
+        sep.mask_ellipse(buf, i['x'], i['y'], i['a'], i['b'], i['theta'])
+        if True in (buf & target):
+            print("Overlap:", i)
+            yield j
+
 
 def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
-              out_fn=None, gal_pos='center', seg_rmin=100.0, obj_rmin=15.0,
-              grow_sig=6.0, mask_thresh=0.02, grow_obj=3.0, kern_sig=4.0,
-              use_hsc_mask=False, sep_extract_kws={}):
+              out_fn=None, gal_pos='center', gal_rmin=5.0,
+              seg_rmin=100.0, obj_rmin=15.0, grow_sig=6.0,
+              mask_thresh=0.02, grow_obj=3.0, kern_sig=4.0,
+              use_hsc_mask=False, sep_extract_kws={}, use_old_filter=False,
+              remove_segmentation_overlaps=False, use_segmap=True, debug=False):
     """
     Generate a mask for galaxy photometry using SEP. Many of these
     parameters are those of SEP, so see its documentation for
@@ -319,6 +331,17 @@ def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
     obj, seg, bkg, img = detect_sources(
         img, thresh, backsize, backffrac,
         None, True, kern_sig, **sep_extract_kws)
+    
+    sbuf = np.zeros_like(image, dtype='uint8')
+    sep.mask_ellipse(sbuf, gal_x, gal_y, gal_rmin, gal_rmin, 0)
+
+    # Deal with wonky segmentation overlaps (if needed)
+    if remove_segmentation_overlaps and use_old_filter:
+        segover = np.unique(seg[sbuf > 0])
+        obj = np.delete(obj, segover)
+        #print("segover: ", seg[sbuf > 0])
+        for i in segover: 
+            seg[seg == i] = 0
 
     #################################################################
     # Exclude objects inside seg_rmin and obj_rmin. Note that the
@@ -334,13 +357,33 @@ def make_mask(image, thresh=1.5, backsize=110, backffrac=0.5,
     obj = obj[keepers]
 
     #################################################################
+    # Exclude objects that overlap with our galaxy
+    #################################################################
+
+    if gal_rmin > 0 and use_old_filter:
+        overlaps = list(query_overlaps(obj, sbuf))
+        #print(overlaps)
+        for i in overlaps:
+            seg[seg == (i + 1)] = 0
+        obj = np.delete(obj, overlaps)
+
+    #################################################################
     # Generate segmentation and object masks. Combine with HSC
     # detection footprints.
     #################################################################
 
-    seg_mask = make_seg_mask(seg, grow_sig, mask_thresh)
+    seg_mask = make_seg_mask(seg, grow_sig, mask_thresh) if use_segmap else np.zeros_like(seg)
     obj_mask = make_obj_mask(obj, img.shape, grow_obj)
     final_mask = (seg_mask | obj_mask | hsc_bad_mask).astype(int)
+
+    if gal_rmin > 0 and not use_old_filter:
+        labeled, features = ndimage.label(final_mask)
+        for i in np.unique(labeled[sbuf > 0]):
+            final_mask[labeled == i] = 0
+        
+
+    # Debug stuff
+    if debug: final_mask[sbuf > 0] = debug
 
     if out_fn is not None:
         fits.writeto(out_fn, final_mask, overwrite=True)
