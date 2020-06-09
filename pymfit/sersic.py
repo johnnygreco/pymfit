@@ -93,5 +93,6 @@ class Sersic(object):
         y, x = np.indices(shape)
         img = self.__call__(x, y)
         if psf is not None:
-            img = convolve_fft(img, psf, normalize_kernel=True)
+            img = convolve_fft(img, psf, normalize_kernel=True, 
+                               boundary='wrap')
         return np.log10(img) if logscale else img
