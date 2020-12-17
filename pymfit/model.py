@@ -94,6 +94,13 @@ DEFAULT_POINTSOURCE = OrderedDict([
     ('I_tot', [1.0, 0.01, 5])
 ])
 
+DEFAULT_TILTEDSKYPLANE = OrderedDict([
+    ('I_0', [0., -5., 5.]),
+    ('m_x', [0., -5., 5.]),
+    ('m_y', [0., -5., 5.]),
+])
+
+
 SERSIC_PARAMS = ['PA', 'ell', 'n', 'I_e', 'r_e']
 SERSIC_GENELLIPSE_PARAMS = ['PA', 'ell', 'c0', 'n', 'I_e', 'r_e']
 GAUSS_PARAMS = ['PA', 'ell', 'I_0', 'sigma']
@@ -105,19 +112,24 @@ FLATSKY_PARAMS = ['I_sky']
 MOFFAT_PARAMS = ['PA', 'ell', 'I_0', 'fwhm', 'beta']
 MODIFIEDKING_PARAMS = ['PA', 'ell', 'I_0', 'r_c', 'r_t', 'alpha']
 POINTSOURCE_PARAMS = ['I_tot']
+TILTEDSKYPLANE_PARAMS = ['I_0', 'm_x', 'm_y']
 
 
-default_params = dict(Sersic=DEFAULT_SERSIC,
-                      Sersic_GenEllipse=DEFAULT_SERSIC_GENELLIPSE,
-                      Gaussian=DEFAULT_GAUSS,
-                      GaussianRing=DEFAULT_RING,
-                      FlatSky=DEFAULT_FLATSKY,
-                      Exponential=DEFAULT_EXP,
-                      BrokenExponential=DEFAULT_BROKENEXP,
-                      EdgeOnDisk=DEFAULT_EDGEDISK,
-                      Moffat=DEFAULT_MOFFAT,
-                      ModifiedKing=DEFAULT_MODIFIEDKING,
-                      PointSource=DEFAULT_POINTSOURCE)
+default_params = dict(
+    Sersic=DEFAULT_SERSIC,
+    Sersic_GenEllipse=DEFAULT_SERSIC_GENELLIPSE,
+    Gaussian=DEFAULT_GAUSS,
+    GaussianRing=DEFAULT_RING,
+    FlatSky=DEFAULT_FLATSKY,
+    Exponential=DEFAULT_EXP,
+    BrokenExponential=DEFAULT_BROKENEXP,
+    EdgeOnDisk=DEFAULT_EDGEDISK,
+    Moffat=DEFAULT_MOFFAT,
+    ModifiedKing=DEFAULT_MODIFIEDKING,
+    PointSource=DEFAULT_POINTSOURCE, 
+    TiltedSkyPlane=DEFAULT_TILTEDSKYPLANE
+)
+
 
 param_names = {
     'Sersic': SERSIC_PARAMS,
@@ -130,7 +142,8 @@ param_names = {
     'BrokenExponential': BROKENEXP_PARAMS,
     'Moffat': MOFFAT_PARAMS,
     'ModifiedKing': MODIFIEDKING_PARAMS,
-    'PointSource': POINTSOURCE_PARAMS
+    'PointSource': POINTSOURCE_PARAMS,
+    'TiltedSkyPlane': TILTEDSKYPLANE_PARAMS
 }
 
 
