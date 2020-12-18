@@ -53,7 +53,7 @@ class PymFitter(object):
         file = open(self.out_fn, 'r')
         lines = file.readlines()
         file.close()
-        # comments = [l for l in lines if l[0]=='#']
+        comments = [l for l in lines if l[0]=='#']
         params = [l for l in lines if l[0] != '#' if l[:2] != '\n'\
                                    if l[0] != 'F' if l[:2] != 'X0'\
                                    if l[:2] != 'Y0']
@@ -70,7 +70,6 @@ class PymFitter(object):
 
         par_num = 0
         cen_num = -1
-        # self.results = OrderedDict()
         for i in range(self.model.ncomp):
             comp = getattr(self.model, 'comp_'+str(i+1))
             self.results['comp_'+str(i+1)] = {}
@@ -89,6 +88,11 @@ class PymFitter(object):
                 self.results['comp_'+str(i+1)].update({par: float(val)})
                 self.results['comp_'+str(i+1)].update({par+'_err': float(err)})
                 par_num += 1
+
+        reduced_chisq = [c for c in comments if
+                         c.split()[1] == 'Reduced'][0].split()[-1]
+        if reduced_chisq != 'none':
+            self.results['reduced_chisq'] = float(reduced_chisq)
 
     def print_results(self):
         for i in range(self.model.ncomp):
