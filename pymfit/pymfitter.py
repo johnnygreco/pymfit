@@ -63,8 +63,8 @@ class PymFitter(object):
         centers = []
 
         for i in range(len(cen_text)//2):
-            _, x0, _, _, xerr = cen_text[i].split()
-            _, y0, _, _, yerr = cen_text[i+1].split()
+            _, x0, _, _, xerr = cen_text[2*i].split()
+            _, y0, _, _, yerr = cen_text[2*i+1].split()
             pos_list = [float(x0), float(y0), float(xerr), float(yerr)]
             centers.append(pos_list)
 

@@ -126,7 +126,7 @@ default_params = dict(
     EdgeOnDisk=DEFAULT_EDGEDISK,
     Moffat=DEFAULT_MOFFAT,
     ModifiedKing=DEFAULT_MODIFIEDKING,
-    PointSource=DEFAULT_POINTSOURCE, 
+    PointSource=DEFAULT_POINTSOURCE,
     TiltedSkyPlane=DEFAULT_TILTEDSKYPLANE
 )
 
@@ -297,18 +297,25 @@ class Model(object):
             funcs = [funcs]
         if not isinstance(params, list):
             params = [params]
+        if not isinstance(dcent, list):
+            dcent = [dcent]
+        if len(dcent) < len(funcs):
+            dcent = dcent * len(functs)
 
         self.funcs = funcs
         self.ncomp = len(funcs)
 
-        zipper = zip(funcs, params, centers)
-        for num, (func, pars, center) in enumerate(zipper):
+        zipper = zip(funcs, params, centers, dcent)
+        for num, (func, pars, center, dc) in enumerate(zipper):
             if center:
-                if (dcent != 'fixed') and (dcent != 0):
-                    min_x = center[0]-dcent if center[0]-dcent > 0  else 1
-                    min_y = center[1]-dcent if center[1]-dcent > 0  else 1
-                    x_cen = [center[0], min_x, center[0]+dcent]
-                    y_cen = [center[1], min_y, center[1]+dcent]
+                if dc is None:
+                    x_cen = center[0]
+                    y_cen = center[1]
+                elif (dc != 'fixed') and (dc != 0):
+                    min_x = center[0]-dc if center[0]-dc > 0  else 1
+                    min_y = center[1]-dc if center[1]-dc > 0  else 1
+                    x_cen = [center[0], min_x, center[0] + dc]
+                    y_cen = [center[1], min_y, center[1] + dc]
                 else:
                     x_cen = [center[0], 'fixed']
                     y_cen = [center[1], 'fixed']
