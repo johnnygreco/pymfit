@@ -299,8 +299,10 @@ class Model(object):
             params = [params]
         if not isinstance(dcent, list):
             dcent = [dcent]
-        if len(dcent) < len(funcs):
-            dcent = dcent * len(functs)
+        if len(dcent) == 1:
+            dcent = dcent * len(funcs)
+
+        assert len(funcs) == len(dcent), 'num functions and dcent must match'
 
         self.funcs = funcs
         self.ncomp = len(funcs)
